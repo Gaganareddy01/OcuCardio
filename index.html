@@ -174,8 +174,10 @@
               <option value="data/real_fundus/images/007-1853-100.jpg">Severe Retinopathy (HE & Edema)</option>
               <option value="data/real_fundus/images/patient_crao_01.jpg">CRAO Eye Stroke (Arterial Block)</option>
               <option value="data/real_fundus/images/007-2408-100.jpg">Moderate HTN Retinopathy</option>
-              <option value="data/real_fundus/images/007-2454-100.jpg">Arteriolar Narrowing (AVR Low)</option>
-              <option value="data/real_fundus/images/007-2470-100.jpg">Normative Fundus Control</option>
+              <option value="data/cohort_20000_images/PATIENT_CRIT_00012.jpg">Cohort 20K: Critical Vascular Hazard</option>
+              <option value="data/cohort_20000_images/PATIENT_HIGH_00451.jpg">Cohort 20K: High Systemic Risk</option>
+              <option value="data/cohort_20000_images/PATIENT_MOD_02692.jpg">Cohort 20K: Moderate Vascular Risk</option>
+              <option value="data/cohort_20000_images/PATIENT_NORM_00100.jpg">Cohort 20K: Normative / Healthy</option>
             </select>
           </div>
 
@@ -1684,8 +1686,27 @@
           grid.appendChild(card);
         });
 
-        // Initialize browser with first dataset
-        browseDataset('drive');
+        // Dynamically populate training dataset select
+        const trainSelect = document.getElementById('train-dataset-select');
+        if (trainSelect) {
+          const currentVal = trainSelect.value;
+          trainSelect.innerHTML = '';
+          datasets.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = `${d.name} (${d.total_images.toLocaleString()} images - ${d.task_type.replace('_', ' ')})`;
+            trainSelect.appendChild(opt);
+          });
+          if (currentVal && Array.from(trainSelect.options).some(o => o.value === currentVal)) {
+            trainSelect.value = currentVal;
+          } else {
+            trainSelect.value = 'cvd_cohort_20k';
+          }
+          onTrainingDatasetChange();
+        }
+
+        // Initialize browser with the full 20,000 cohort
+        browseDataset('cvd_cohort_20k');
       } catch (err) {
         console.error("Error loading datasets:", err);
       }
