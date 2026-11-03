@@ -1,0 +1,34 @@
+{
+  "id": "rfmid",
+  "name": "RFMiD (Retinal Fundus Multi-Disease Image Dataset)",
+  "task_type": "disease_classification",
+  "description": "Multi-disease dataset designed for training deep learning models to screen for 45 frequent and rare retinal conditions.",
+  "total_images": 40,
+  "labelled_images": 40,
+  "unlabelled_images": 0,
+  "dimensions": "512 x 512",
+  "formats": [
+    "JPEG"
+  ],
+  "classes": [
+    "Normal",
+    "Diabetic Retinopathy",
+    "Age-Related Macular Degeneration",
+    "Media Haze",
+    "Branch Retinal Vein Occlusion",
+    "Myopia"
+  ],
+  "label_distribution": {
+    "Normal": 7,
+    "Diabetic Retinopathy": 7,
+    "Age-Related Macular Degeneration": 7,
+    "Media Haze": 7,
+    "Branch Retinal Vein Occlusion": 6,
+    "Myopia": 6
+  },
+  "supports_cvd_prediction": false,
+  "patient_id_available": false,
+  "intended_task": "Multi-disease classification (retinal findings only; not CVD outcome)",
+  "storage_path": "data/datasets/rfmid",
+  "status": "ready"
+}

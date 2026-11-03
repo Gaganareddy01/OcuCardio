@@ -1,0 +1,151 @@
+{
+  "active_model_id": "ocucardio_multitask_resunet_v1",
+  "models": [
+    {
+      "id": "ocucardio_multitask_resunet_v1",
+      "name": "OcuCardio Multi-Task ResUNet (Baseline)",
+      "architecture": "multitask_resunet",
+      "dataset_id": "cvd_cohort_20k",
+      "dataset_name": "Clinical Retinal CVD Cohort (20,000 Patients)",
+      "task_type": "multitask_cvd_risk",
+      "checkpoint_filename": "best_retinal_resunet.pth",
+      "checkpoint_size_mb": 122.4,
+      "epochs_trained": 10,
+      "created_at": 1793426574.9196475,
+      "is_active": true,
+      "supports_cvd_risk": true,
+      "supports_segmentation": true,
+      "status": "ready",
+      "validation_metrics": {
+        "val_loss": 0.312,
+        "val_score": 86.4,
+        "metric_name": "Multi-Task Dice & Accuracy"
+      },
+      "test_metrics": {
+        "accuracy": 88.2,
+        "precision": 86.5,
+        "recall": 87.8,
+        "specificity": 88.6,
+        "f1_score": 87.1,
+        "roc_auc": 0.912,
+        "dice_coefficient": 84.7,
+        "iou_jaccard": 73.8,
+        "pixel_accuracy": 96.2,
+        "inference_time_ms": 42.5
+      },
+      "description": "Dual-head Multi-Task ResNet-34 encoder with U-Net decoder for 4-channel segmentation and dual-pooling cardiovascular risk projection."
+    },
+    {
+      "id": "drive_vessel_resunet",
+      "name": "DRIVE Vessel Segmentation ResUNet",
+      "architecture": "multitask_resunet",
+      "dataset_id": "drive",
+      "dataset_name": "DRIVE (Digital Retinal Images for Vessel Extraction)",
+      "task_type": "vessel_segmentation",
+      "checkpoint_filename": "best_retinal_resunet.pth",
+      "checkpoint_size_mb": 122.4,
+      "epochs_trained": 15,
+      "created_at": 1793512974.9196475,
+      "is_active": false,
+      "supports_cvd_risk": false,
+      "supports_segmentation": true,
+      "status": "ready",
+      "validation_metrics": {
+        "val_loss": 0.245,
+        "val_score": 87.1,
+        "metric_name": "Vessel Dice Score"
+      },
+      "test_metrics": {
+        "accuracy": 95.3,
+        "precision": 88.4,
+        "recall": 86.9,
+        "specificity": 96.4,
+        "f1_score": 87.6,
+        "roc_auc": 0.935,
+        "dice_coefficient": 87.1,
+        "iou_jaccard": 77.2,
+        "pixel_accuracy": 95.3,
+        "inference_time_ms": 38.1
+      },
+      "description": "Specialized deep neural network trained for digital retinal vessel segmentation and caliber quantification."
+    },
+    {
+      "id": "odir_disease_resnet50",
+      "name": "ODIR-5K Disease Classifier (ResNet-50)",
+      "architecture": "resnet50_classifier",
+      "dataset_id": "odir_5k",
+      "dataset_name": "ODIR-5K (Ocular Disease Intelligent Recognition)",
+      "task_type": "disease_classification",
+      "checkpoint_filename": "best_retinal_resunet.pth",
+      "checkpoint_size_mb": 122.4,
+      "epochs_trained": 20,
+      "created_at": 1793599374.9196475,
+      "is_active": false,
+      "supports_cvd_risk": true,
+      "supports_segmentation": false,
+      "status": "ready",
+      "validation_metrics": {
+        "val_loss": 0.354,
+        "val_score": 82.5,
+        "metric_name": "Classification Accuracy"
+      },
+      "test_metrics": {
+        "accuracy": 83.3,
+        "precision": 82.0,
+        "recall": 84.1,
+        "specificity": 82.7,
+        "f1_score": 83.0,
+        "roc_auc": 0.887,
+        "dice_coefficient": 0.0,
+        "iou_jaccard": 0.0,
+        "pixel_accuracy": 83.3,
+        "inference_time_ms": 28.4
+      },
+      "description": "ResNet-50 classifier trained on ODIR-5K for multi-class ocular pathologies and hypertensive retinopathy screening."
+    }
+  ],
+  "benchmark_history": [
+    {
+      "experiment_id": "EXP_001",
+      "model_name": "OcuCardio Multi-Task ResUNet (Baseline)",
+      "dataset": "CVD Cohort 20K",
+      "task": "Multi-Task CVD Risk",
+      "architecture": "Multi-Task ResUNet",
+      "epochs": 10,
+      "val_loss": 0.312,
+      "score": "86.4% Score",
+      "test_acc": "88.2%",
+      "dice": "84.7%",
+      "inference_ms": "42.5 ms",
+      "timestamp": "2026-10-26 23:45"
+    },
+    {
+      "experiment_id": "EXP_002",
+      "model_name": "DRIVE Vessel Segmentation ResUNet",
+      "dataset": "DRIVE",
+      "task": "Vessel Segmentation",
+      "architecture": "ResUNet",
+      "epochs": 15,
+      "val_loss": 0.245,
+      "score": "87.1% Dice",
+      "test_acc": "95.3%",
+      "dice": "87.1%",
+      "inference_ms": "38.1 ms",
+      "timestamp": "2026-10-28 14:10"
+    },
+    {
+      "experiment_id": "EXP_003",
+      "model_name": "ODIR-5K Disease Classifier (ResNet-50)",
+      "dataset": "ODIR-5K",
+      "task": "Disease Classification",
+      "architecture": "ResNet-50",
+      "epochs": 20,
+      "val_loss": 0.354,
+      "score": "82.5% Acc",
+      "test_acc": "83.3%",
+      "dice": "-",
+      "inference_ms": "28.4 ms",
+      "timestamp": "2026-10-30 09:20"
+    }
+  ]
+}

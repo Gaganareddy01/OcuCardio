@@ -1,0 +1,76 @@
+# ==========================================
+# OcuCardio .gitignore
+# Prevents uploading large binaries, virtualenvs,
+# sensitive files, temporary caches, and heavy datasets.
+# ==========================================
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Node modules
+node_modules/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyd
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local Runtime Logs, PIDs, Dynamic Ports
+*.log
+*.tmp
+*.bak
+.active_port
+server_err.log
+server_out.log
+black.html
+outputs/
+
+# Credentials, Secrets, and Environment Variables
+.env
+*.env
+.env.*
+secrets.*
+credentials.json
+*.key
+*.pem
+
+# Large Model Checkpoints (> 100MB exceeds GitHub hard limit)
+# Model weights are loaded from HuggingFace / GitHub Releases
+checkpoints/*.pth
+checkpoints/*.pt
+checkpoints/*.onnx
+checkpoints/*.bin
+!checkpoints/model_registry.json
+!checkpoints/.gitkeep
+
+# Large Bulk Generated Cohort Images & Heavy Caches
+data/cohort_20000_images/
+data/dataset_20000/
+data/dataset_catalog.json
+data/dataset_catalog.json.tmp
+data/uploaded_datasets/*
+!data/uploaded_datasets/.gitkeep
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

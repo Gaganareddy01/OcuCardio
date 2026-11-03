@@ -1,0 +1,27 @@
+{
+  "id": "chase_db1",
+  "name": "CHASE_DB1 (Child Heart and Health Study in England)",
+  "task_type": "vessel_segmentation",
+  "description": "Multi-ethnic cohort dataset with high-resolution retinal images of left and right eyes to evaluate microvascular caliber and tortuosity.",
+  "total_images": 28,
+  "labelled_images": 28,
+  "unlabelled_images": 0,
+  "dimensions": "512 x 512",
+  "formats": [
+    "JPEG",
+    "PNG"
+  ],
+  "classes": [
+    "Background",
+    "Vasculature"
+  ],
+  "label_distribution": {
+    "Background": 92.1,
+    "Vasculature": 7.9
+  },
+  "supports_cvd_prediction": false,
+  "patient_id_available": true,
+  "intended_task": "Vessel segmentation and vascular tortuosity evaluation",
+  "storage_path": "data/datasets/chase_db1",
+  "status": "ready"
+}

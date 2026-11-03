@@ -1,0 +1,32 @@
+{
+  "id": "brset",
+  "name": "BRSET (Brazilian Multilabel Ophthalmological Dataset)",
+  "task_type": "multilabel_clinical",
+  "description": "Comprehensive Latin American multi-label fundus dataset linking retinal imaging with systemic clinical metadata (arterial hypertension, diabetes, age, sex).",
+  "total_images": 45,
+  "labelled_images": 45,
+  "unlabelled_images": 0,
+  "dimensions": "512 x 512",
+  "formats": [
+    "JPEG"
+  ],
+  "classes": [
+    "Normal",
+    "Diabetic Retinopathy",
+    "Systemic Hypertension",
+    "Macular Edema",
+    "Papilledema"
+  ],
+  "label_distribution": {
+    "Normal": 9,
+    "Diabetic Retinopathy": 9,
+    "Systemic Hypertension": 9,
+    "Macular Edema": 9,
+    "Papilledema": 9
+  },
+  "supports_cvd_prediction": true,
+  "patient_id_available": true,
+  "intended_task": "Multi-label disease classification with systemic clinical covariates",
+  "storage_path": "data/datasets/brset",
+  "status": "ready"
+}

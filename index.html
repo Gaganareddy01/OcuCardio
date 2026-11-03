@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OcuCardio – AI-Powered Retinal Image Analysis for Cardiovascular Risk Assessment</title>
+  
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#EEF2FF',
+              100: '#E0E7FF',
+              200: '#C7D2FE',
+              500: '#6366F1',
+              600: '#4F46E5',
+              700: '#4338CA',
+              800: '#3730A3',
+              900: '#312E81',
+            },
+            surface: {
+              50: '#F8FAFC',
+              100: '#F1F5F9',
+              200: '#E2E8F0',
+              300: '#CBD5E1',
+            }
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03)',
+            'card': '0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(15, 23, 42, 0.06)',
+            'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .soft-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 6px 20px -4px rgba(15, 23, 42, 0.05);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .fundus-viewport {
+      position: relative;
+      width: 512px;
+      height: 512px;
+      max-width: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #090D16;
+      box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18), inset 0 0 24px rgba(0, 0, 0, 0.7);
+      cursor: crosshair;
+      margin: 0 auto;
+    }
+
+    .loupe-glass {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), inset 0 0 16px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+      display: none;
+      overflow: hidden;
+      z-index: 50;
+      background: #000;
+    }
+
+    .nav-tab-btn.active {
+      background: #4F46E5;
+      color: #FFFFFF;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+    }
+    .nav-tab-btn:not(.active) {
+      color: #475569;
+    }
+    .nav-tab-btn:not(.active):hover {
+      background: #EEF2FF;
+      color: #4338CA;
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ================= SECTION 1: TOP NAVIGATION BAR ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-18 gap-4">
+        
+        <!-- Brand & Subtitle -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg font-bold tracking-tight text-slate-900">OcuCardio</h1>
+              <span class="px-2 py-0.5 text-[10px] font-semibold bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">v2.5 AI Platform</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-medium tracking-tight">AI-Powered Retinal Image Analysis for Cardiovascular Risk Assessment</p>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden md:flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200">
+          <button onclick="switchTab('inspector')" id="tab-btn-inspector" class="nav-tab-btn active px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+            Scan Inspector
+          </button>
+          <button onclick="switchTab('datasets')" id="tab-btn-datasets" class="nav-tab-btn px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7zM9 4v16M4 11h16" /></svg>
+            Dataset Hub & Library
+          </button>
+          <button onclick="switchTab('training')" id="tab-btn-training" class="nav-tab-btn px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+            Model Training & Evaluation
+          </button>
+          <button onclick="switchTab('models')" id="tab-btn-models" class="nav-tab-btn px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            Model Management
+          </button>
+        </nav>
+
+        <!-- Right: Active Model Status & Quick Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Active Model Pill -->
+          <div class="hidden lg:flex items-center gap-2 bg-indigo-50/80 px-3 py-1.5 rounded-xl border border-indigo-200/70" id="header-active-model-box">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div class="text-left">
+              <span class="block text-[9px] font-bold uppercase tracking-wider text-indigo-600">Active Model</span>
+              <span class="block text-xs font-semibold text-slate-800 truncate max-w-[140px]" id="header-active-model-name">ResUNet Multi-Task</span>
+            </div>
+          </div>
+
+          <!-- Benchmark Samples Dropdown -->
+          <div class="relative">
+            <select id="quick-sample-select" onchange="if(this.value) loadQuickSample(this.value)" class="text-xs bg-white text-slate-700 font-medium py-1.5 px-3 rounded-lg border border-slate-200 hover:border-slate-300 shadow-2xs focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition cursor-pointer">
+              <option value="">Benchmark Cases ▾</option>
+              <option value="data/real_fundus/images/007-1853-100.jpg">Severe Retinopathy (HE & Edema)</option>
+              <option value="data/real_fundus/images/patient_crao_01.jpg">CRAO Eye Stroke (Arterial Block)</option>
+              <option value="data/real_fundus/images/007-2408-100.jpg">Moderate HTN Retinopathy</option>
+              <option value="data/real_fundus/images/007-2454-100.jpg">Arteriolar Narrowing (AVR Low)</option>
+              <option value="data/real_fundus/images/007-2470-100.jpg">Normative Fundus Control</option>
+            </select>
+          </div>
+
+          <!-- Upload Photo Button -->
+          <button onclick="document.getElementById('file-upload-input').click()" class="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg shadow-xs transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+            Upload Photo
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: SCAN INSPECTOR (VERTICAL DASHBOARD LAYOUT) -->
+    <!-- ========================================================================= -->
+    <div id="tab-inspector" class="space-y-6">
+
+      <!-- ================= SECTION 2: RETINAL IMAGE UPLOAD ================= -->
+      <section class="soft-card p-6 bg-gradient-to-r from-white via-indigo-50/30 to-purple-50/20">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          
+          <!-- Drop Area -->
+          <div class="flex-1 w-full" id="drop-zone"
+               ondragover="event.preventDefault(); this.classList.add('border-indigo-500', 'bg-indigo-50/50')"
+               ondragleave="this.classList.remove('border-indigo-500', 'bg-indigo-50/50')"
+               ondrop="handleFileDrop(event)">
+            <label for="file-upload-input" class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-indigo-200 rounded-xl hover:border-indigo-400 hover:bg-white/80 transition cursor-pointer group">
+              <div class="w-12 h-12 rounded-full bg-indigo-100/70 text-indigo-600 flex items-center justify-center mb-3 group-hover:scale-105 transition">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+              </div>
+              <span class="text-sm font-semibold text-slate-800">Drag and drop retinal fundus photo, or <span class="text-indigo-600 underline">browse files</span></span>
+              <span class="text-xs text-slate-500 mt-1">Supports standard JPG, JPEG, PNG, TIFF, and calibrated DICOM exports</span>
+              <input type="file" id="file-upload-input" class="hidden" accept=".jpg,.jpeg,.png,.tif,.tiff" onchange="handleFileSelect(event)">
+            </label>
+          </div>
+
+          <!-- Uploaded Image Information & Quality Check -->
+          <div class="w-full md:w-96 soft-card p-4 space-y-3 bg-white/90 border-slate-200">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span class="text-xs font-bold text-slate-900 uppercase tracking-wider">Image Preprocessing & Quality</span>
+              <span id="badge-quality-status" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">Gradable</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-lg bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Loaded Image</span>
+                <span id="info-file-name" class="font-semibold text-slate-800 truncate block">007-1853-100.jpg</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Resolution</span>
+                <span id="info-file-res" class="font-semibold text-slate-800 block">512 × 512 px</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Sharpness (Laplacian)</span>
+                <span id="info-quality-sharpness" class="font-semibold text-slate-800 block font-mono">134.2 (Sharp)</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Active Model</span>
+                <span id="info-active-model-name" class="font-semibold text-indigo-700 block truncate">ResUNet v1</span>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 italic">✓ Calibrated normalization applied. Circular aperture mask verified.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3: INTERACTIVE RETINAL CANVAS ================= -->
+      <section class="soft-card p-6 space-y-4">
+        
+        <!-- Controls Bar Above Canvas -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Multi-Spectral Retinal Canvas</h2>
+            <p class="text-xs text-slate-500">Deep Multi-Task ResUNet spatial layer decomposition and interactive feature inspection</p>
+          </div>
+
+          <!-- Canvas Controls: Filters & Loupe -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Spectral Filters -->
+            <div class="flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200 text-xs">
+              <button onclick="setSpectralMode('rgb')" id="btn-filter-rgb" class="px-2.5 py-1 rounded-md font-semibold bg-white text-indigo-600 shadow-2xs">Original RGB</button>
+              <button onclick="setSpectralMode('redfree')" id="btn-filter-redfree" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900">Red-Free (Green)</button>
+              <button onclick="setSpectralMode('clahe')" id="btn-filter-clahe" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900">Contrast CLAHE</button>
+            </div>
+
+            <!-- Loupe Magnifier Toggle -->
+            <button onclick="toggleLoupe()" id="btn-loupe-toggle" class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition flex items-center gap-1.5 shadow-2xs">
+              <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+              Loupe Magnifier (2.5×)
+            </button>
+          </div>
+        </div>
+
+        <!-- Canvas Viewport Frame (Centered & Spacious) -->
+        <div class="flex justify-center items-center py-4 bg-slate-900/5 rounded-2xl border border-slate-100">
+          <div class="fundus-viewport" id="viewport-box" onmousemove="handleLoupeMove(event)" onmouseleave="hideLoupe()">
+            
+            <!-- Layer 0: Base Fundus Image -->
+            <canvas id="c-base" width="512" height="512" class="absolute inset-0 w-full h-full object-cover"></canvas>
+            
+            <!-- Layer 1: Blood Vessels & Caliber -->
+            <canvas id="c-vessels" width="512" height="512" class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-200"></canvas>
+            
+            <!-- Layer 2: Optic Disc & Edema Margin -->
+            <canvas id="c-disc" width="512" height="512" class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-200"></canvas>
+            
+            <!-- Layer 3: Hard Lipid Exudates -->
+            <canvas id="c-he" width="512" height="512" class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-200"></canvas>
+            
+            <!-- Layer 4: Neovascularization Fronds -->
+            <canvas id="c-nv" width="512" height="512" class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-200"></canvas>
+            
+            <!-- Layer 5: Microaneurysms -->
+            <canvas id="c-ma" width="512" height="512" class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-200"></canvas>
+            
+            <!-- Layer 6: Feature Attention Heatmap -->
+            <canvas id="c-heatmap" width="512" height="512" class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-200 opacity-0"></canvas>
+
+            <!-- Floating Loupe Glass -->
+            <div id="loupe" class="loupe-glass">
+              <canvas id="c-loupe" width="140" height="140"></canvas>
+            </div>
+
+            <!-- Loading Spinner Overlay -->
+            <div id="loading-spinner" class="absolute inset-0 bg-white/80 backdrop-blur-xs flex flex-col items-center justify-center gap-3 hidden z-30">
+              <div class="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+              <span class="text-xs font-semibold text-slate-800 font-mono tracking-tight">Running Multi-Task Deep Model...</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Layer Toggles & Opacity Slider -->
+        <div class="space-y-3 pt-2">
+          <div class="flex items-center justify-between text-xs text-slate-600">
+            <span class="font-semibold text-slate-700">Overlay Annotation Opacity:</span>
+            <div class="flex items-center gap-2">
+              <input type="range" id="slider-opacity" min="0" max="100" value="85" oninput="updateLayerOpacity(this.value)" class="w-36 accent-indigo-600 cursor-pointer">
+              <span id="label-opacity" class="font-mono text-slate-800 font-bold w-10 text-right">85%</span>
+            </div>
+          </div>
+
+          <!-- Individual Checkboxes -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+            <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 cursor-pointer transition">
+              <input type="checkbox" id="chk-vessels" checked onchange="toggleLayers()" class="rounded text-indigo-600 focus:ring-0">
+              <span class="font-medium text-slate-700">Vasculature</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-lg bg-amber-50/60 border border-amber-200 hover:bg-amber-100/60 cursor-pointer transition">
+              <input type="checkbox" id="chk-disc" checked onchange="toggleLayers()" class="rounded text-amber-600 focus:ring-0">
+              <span class="font-medium text-amber-900">Disc Edema</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-lg bg-purple-50/60 border border-purple-200 hover:bg-purple-100/60 cursor-pointer transition">
+              <input type="checkbox" id="chk-nv" checked onchange="toggleLayers()" class="rounded text-purple-600 focus:ring-0">
+              <span class="font-medium text-purple-900">Neovascular</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-lg bg-orange-50/60 border border-orange-200 hover:bg-orange-100/60 cursor-pointer transition">
+              <input type="checkbox" id="chk-he" checked onchange="toggleLayers()" class="rounded text-orange-600 focus:ring-0">
+              <span class="font-medium text-orange-900">Exudates</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-lg bg-rose-50/60 border border-rose-200 hover:bg-rose-100/60 cursor-pointer transition">
+              <input type="checkbox" id="chk-ma" checked onchange="toggleLayers()" class="rounded text-rose-600 focus:ring-0">
+              <span class="font-medium text-rose-900">Microaneurysms</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-lg bg-indigo-50/60 border border-indigo-200 hover:bg-indigo-100/60 cursor-pointer transition">
+              <input type="checkbox" id="chk-heatmap" onchange="toggleLayers()" class="rounded text-indigo-600 focus:ring-0">
+              <span class="font-medium text-indigo-900">Attention Map</span>
+            </label>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= SECTION 4: DYNAMIC CVD RISK ASSESSMENT ================= -->
+      <section class="soft-card p-6 space-y-4 border-l-4 border-l-indigo-600" id="section-cvd-risk">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Cardiovascular & Microvascular Risk Assessment</h3>
+            <p class="text-xs text-slate-500">Multi-cohort validated risk projection based on deep retinal features and arteriolar-to-venular ratio (AVR)</p>
+          </div>
+          <span id="cvd-model-badge" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">Framingham & UK Biobank Calibrated</span>
+        </div>
+
+        <!-- Banner for models that do not support CVD -->
+        <div id="cvd-unsupported-banner" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+          <div class="flex items-center gap-2 font-semibold">
+            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            CVD Risk Estimation Unavailable for Selected Model
+          </div>
+          <p class="mt-1 text-amber-800" id="cvd-unsupported-msg">The currently active model was trained strictly on vessel segmentation. Switch to OcuCardio Multi-Task ResUNet in Model Management to enable CVD risk scoring.</p>
+        </div>
+
+        <!-- Grid of 4 Primary CVD Metrics -->
+        <div id="cvd-metrics-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Metric 1: Overall CVD Risk Score -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-600">Overall CVD Risk Score</span>
+              <span id="badge-cvd-tier" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-800">Moderate</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-cvd-score" class="text-3xl font-extrabold text-slate-900 font-mono tracking-tight">55.9%</span>
+              <span class="text-xs text-slate-500">composite</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div id="bar-cvd-score" class="bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-600 h-full rounded-full transition-all duration-500" style="width: 55.9%"></div>
+            </div>
+            <p class="text-[11px] text-slate-500" id="text-cvd-tier-desc">Elevated generalized systemic risk</p>
+          </div>
+
+          <!-- Metric 2: 5-Year Stroke Hazard -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-600">5-Yr Stroke Hazard</span>
+              <span class="text-[10px] text-slate-400 font-mono">HR 2.14×</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-stroke-risk" class="text-3xl font-extrabold text-indigo-700 font-mono tracking-tight">38.4%</span>
+              <span class="text-xs text-slate-500">cumulative</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div id="bar-stroke-risk" class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: 38.4%"></div>
+            </div>
+            <p class="text-[11px] text-slate-500">Associated with focal ischemic burden</p>
+          </div>
+
+          <!-- Metric 3: CAD / Atherosclerosis Risk -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-600">CAD / Athero Hazard</span>
+              <span class="text-[10px] text-slate-400 font-mono">CACS Correlated</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-cad-risk" class="text-3xl font-extrabold text-slate-900 font-mono tracking-tight">41.2%</span>
+              <span class="text-xs text-slate-500">coronary index</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div id="bar-cad-risk" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 41.2%"></div>
+            </div>
+            <p class="text-[11px] text-slate-500">Arteriolar wall thickening documented</p>
+          </div>
+
+          <!-- Metric 4: Hypertensive Retinopathy Grade -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <span class="text-xs font-semibold text-slate-600 block">Keith-Wagener-Barker</span>
+            <div class="text-base font-bold text-slate-900 leading-tight truncate" id="stat-kwb-grade">Grade II Retinopathy</div>
+            <div class="text-xs font-mono font-medium text-slate-600" id="stat-kwb-avr">AVR: 0.58 (Arteriolar Attenuation)</div>
+            <p class="text-[11px] text-slate-500 pt-1">Generalized caliber vasoconstriction</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 5: DETAILED RETINAL ANALYSIS (6 CARDS) ================= -->
+      <section class="space-y-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Detailed Biomarker Quantification</h3>
+          <p class="text-xs text-slate-500">Autonomous clinical lesion segmentation and microvascular caliber metrics</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+          <!-- Card 1: Optic Disc Edema -->
+          <div class="soft-card p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">1. Disc Edema (Papilledema)</span>
+              <span id="badge-disc-status" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-100 text-amber-800 border border-amber-300">Edema Detected</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Frisén Staging</span>
+                <span id="stat-disc-frisen" class="font-bold text-slate-800">Grade 2</span>
+              </div>
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Margin Gradient</span>
+                <span id="stat-disc-gradient" class="font-bold text-slate-800">8.4 (Blurred)</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500" id="stat-disc-desc">Peripapillary boundary obscurity noted on temporal margins.</p>
+          </div>
+
+          <!-- Card 2: Neovascularization -->
+          <div class="soft-card p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">2. Neovascularization (NV)</span>
+              <span id="badge-nv-status" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600">None Detected</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Type</span>
+                <span id="stat-nv-type" class="font-bold text-slate-800">None</span>
+              </div>
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Burden Area</span>
+                <span id="stat-nv-area" class="font-bold text-slate-800">0 px</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500" id="stat-nv-desc">No abnormal capillary proliferation fronds detected across arcades.</p>
+          </div>
+
+          <!-- Card 3: Hard Exudates -->
+          <div class="soft-card p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">3. Hard Lipid Exudates</span>
+              <span id="badge-he-status" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-orange-100 text-orange-800 border border-orange-300">Present</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Focal Lesion Count</span>
+                <span id="stat-he-count" class="font-bold text-slate-800">14 deposits</span>
+              </div>
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Foveal Threat</span>
+                <span id="stat-he-fovea" class="font-bold text-slate-800">CSME Sparing</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500" id="stat-he-desc">Lipid extravasation from breakdown of inner blood-retina barrier.</p>
+          </div>
+
+          <!-- Card 4: Microaneurysms -->
+          <div class="soft-card p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">4. Microaneurysms & Petechiae</span>
+              <span id="badge-ma-status" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-rose-100 text-rose-800 border border-rose-300">Focal</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Total Count</span>
+                <span id="stat-ma-count" class="font-bold text-slate-800">6 microlesions</span>
+              </div>
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Severity</span>
+                <span id="stat-ma-sev" class="font-bold text-slate-800">Mild Out-pouching</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500">Capillary pericyte loss and localized endothelial sacculation.</p>
+          </div>
+
+          <!-- Card 5: Arteriolar-to-Venular Ratio (AVR) -->
+          <div class="soft-card p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">5. Arteriolar-to-Venular (AVR)</span>
+              <span id="badge-avr-status" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-100 text-amber-800 border border-amber-300">Narrowed</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Measured AVR</span>
+                <span id="stat-avr-val" class="font-bold text-slate-800 font-mono">0.58</span>
+              </div>
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Normative Cutoff</span>
+                <span class="font-bold text-slate-800 font-mono">≥ 0.67</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500">Generalized arteriolosclerosis marker with prognostic CVD hazard.</p>
+          </div>
+
+          <!-- Card 6: Vessel Density & Tortuosity -->
+          <div class="soft-card p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">6. Vessel Density & Complexity</span>
+              <span id="badge-vessel-status" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">Normal Tree</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Vessel Area Density</span>
+                <span id="stat-vessel-density" class="font-bold text-slate-800 font-mono">11.4%</span>
+              </div>
+              <div class="p-2 rounded-md bg-slate-50">
+                <span class="text-slate-400 block text-[10px]">Tortuosity Index</span>
+                <span id="stat-vessel-tortuosity" class="font-bold text-slate-800 font-mono">1.18 (Mild)</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500">Retinal vascular branching fractal dimension and perfusion area.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 6: CLINICAL AI FINDINGS & SPECIALIST ACTION PLAN ================= -->
+      <section class="soft-card p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Clinical AI Findings & Specialist Action Plan</h3>
+            <p class="text-xs text-slate-500">Synthesized computational report with recommended clinical triage directives</p>
+          </div>
+          <button onclick="window.print()" class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition flex items-center gap-1.5 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            Print / Export PDF
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-xs font-bold text-slate-900 uppercase tracking-wider block mb-1">Algorithmic Diagnostic Narrative</span>
+            <p id="clinical-narrative-text" class="text-xs text-slate-700 leading-relaxed font-normal">
+              Fundus image demonstrates prominent arteriolar attenuation (AVR 0.58) and focal microvascular compromise. Discrete lipid exudates observed without direct foveal threat. Disc margins demonstrate mild blur concerning for early Frisén Grade 2 papilledema. Systemic vascular risk index is estimated at 55.9% (Moderate-to-High).
+            </p>
+          </div>
+
+          <div>
+            <span class="text-xs font-bold text-slate-900 uppercase tracking-wider block mb-2">Recommended Specialist Follow-Up</span>
+            <ul id="clinical-recommendations-list" class="space-y-2 text-xs">
+              <li class="flex items-start gap-2 p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                <span class="text-indigo-600 font-bold">•</span>
+                <span class="text-slate-800"><strong>Neuro-Ophthalmology Evaluation:</strong> Recommended to evaluate optic nerve elevation and assess intracranial pressure dynamics.</span>
+              </li>
+              <li class="flex items-start gap-2 p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                <span class="text-indigo-600 font-bold">•</span>
+                <span class="text-slate-800"><strong>Cardiovascular Workup:</strong> 24-hour ambulatory blood pressure monitoring (ABPM) and carotid duplex ultrasound to assess systemic arteriolosclerosis.</span>
+              </li>
+              <li class="flex items-start gap-2 p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                <span class="text-indigo-600 font-bold">•</span>
+                <span class="text-slate-800"><strong>Comprehensive Metabolic Panel:</strong> Fasting lipid panel and HbA1c to evaluate endothelial microvascular risk factors.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Academic & Clinical Disclaimer -->
+          <div class="p-3 rounded-xl bg-indigo-50/60 border border-indigo-200/70 text-[11px] text-indigo-900 flex items-start gap-2">
+            <svg class="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span><strong>Research AI Platform Notice:</strong> OcuCardio predictions and biomarker segmentations are computational research outputs intended for clinical investigation and academic validation. Confirmatory diagnosis requires formal clinical examination by a licensed ophthalmologist and cardiologist.</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: DYNAMIC DATASET HUB & LIBRARY -->
+    <!-- ========================================================================= -->
+    <div id="tab-datasets" class="hidden space-y-6">
+      
+      <!-- Top Overview Header -->
+      <section class="soft-card p-6 bg-gradient-to-r from-white via-indigo-50/20 to-purple-50/20">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Dynamic Dataset Hub & Registry</h2>
+            <p class="text-xs text-slate-500">Import, explore, validate, and train on real multi-institutional retinal fundus datasets</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openUploadDatasetModal()" class="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg shadow-xs transition flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              Upload Dataset (ZIP)
+            </button>
+          </div>
+        </div>
+
+        <!-- Aggregate Stats Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Total Datasets</span>
+            <span id="hub-stat-total-datasets" class="text-2xl font-bold text-slate-900 font-mono">7</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Total Retinal Images</span>
+            <span id="hub-stat-total-images" class="text-2xl font-bold text-indigo-700 font-mono">20,201</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Labelled & Annotated</span>
+            <span id="hub-stat-labelled-images" class="text-2xl font-bold text-emerald-700 font-mono">20,201</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Supported Tasks</span>
+            <span class="text-2xl font-bold text-purple-700 font-mono">4 Types</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dataset Grid / Catalog List -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Available Clinical Datasets</h3>
+          <span class="text-xs text-slate-500">Each dataset is restricted to its validated clinical task</span>
+        </div>
+
+        <div id="datasets-card-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Dynamically populated via loadDatasets() -->
+        </div>
+      </section>
+
+      <!-- Dataset Image Browser Section -->
+      <section class="soft-card p-6 space-y-4" id="dataset-browser-section">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-bold text-slate-900">Dataset Image Explorer</h3>
+              <span id="browser-dataset-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">DRIVE</span>
+            </div>
+            <p class="text-xs text-slate-500" id="browser-dataset-desc">Preview individual scans and inspect ground-truth annotations</p>
+          </div>
+
+          <!-- Browser Filters -->
+          <div class="flex items-center gap-2">
+            <input type="text" id="browser-search-input" placeholder="Search filename or Patient ID..." oninput="debounceBrowserSearch()" class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 w-52">
+            <select id="browser-class-filter" onchange="filterBrowserImages()" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none">
+              <option value="">All Classes</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Image Gallery Grid -->
+        <div id="browser-image-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 min-h-[160px]">
+          <!-- Images populated here -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
+          <span class="text-slate-500" id="browser-page-info">Showing 1-24 of 20 images</span>
+          <div class="flex items-center gap-2">
+            <button onclick="changeBrowserPage(-1)" id="btn-browser-prev" class="px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Previous</button>
+            <button onclick="changeBrowserPage(1)" id="btn-browser-next" class="px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Next</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: MODEL TRAINING & PERFORMANCE EVALUATION -->
+    <!-- ========================================================================= -->
+    <div id="tab-training" class="hidden space-y-6">
+
+      <!-- Wizard / Training Configuration (Step 1 to Step 4) -->
+      <section class="soft-card p-6 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">AI Model Training & Optimization Studio</h2>
+            <p class="text-xs text-slate-500">Train ResUNet or ResNet models with patient-level leakage prevention, data augmentation, and live tracking</p>
+          </div>
+          <span class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-purple-50 text-purple-700 border border-purple-200">PyTorch & CUDA Accelerated</span>
+        </div>
+
+        <!-- 4 Step Interactive Config Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          
+          <!-- STEP 1: Dataset & Task Selection -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center gap-2 font-bold text-indigo-700">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">1</span>
+              <span>Dataset & Task</span>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Target Dataset</label>
+              <select id="train-dataset-select" onchange="onTrainingDatasetChange()" class="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white">
+                <option value="drive">DRIVE (Vessel Segmentation)</option>
+                <option value="stare">STARE (Vessel & Lesions)</option>
+                <option value="chase_db1">CHASE_DB1 (Vessel Caliber)</option>
+                <option value="rfmid">RFMiD (Disease Multi-Class)</option>
+                <option value="odir_5k">ODIR-5K (Ocular Disease & HTN)</option>
+                <option value="brset">BRSET (Multilabel Clinical)</option>
+                <option value="cvd_cohort_20k">CVD Cohort 20K (Multi-Task)</option>
+              </select>
+            </div>
+            <div class="p-2 rounded bg-indigo-50/60 text-[10px] text-indigo-900" id="train-task-desc">
+              Task: Retinal vessel tree extraction & caliber quantification
+            </div>
+          </div>
+
+          <!-- STEP 2: Preprocessing & Augmentation -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center gap-2 font-bold text-indigo-700">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">2</span>
+              <span>Preprocessing</span>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Resolution Dimension</label>
+              <select id="train-res-select" class="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white">
+                <option value="512">512 × 512 (Clinical Gold Standard)</option>
+                <option value="256">256 × 256 (High Speed Mode)</option>
+              </select>
+            </div>
+            <div class="space-y-1.5 pt-1">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="chk-aug-flip" checked class="rounded text-indigo-600">
+                <span class="text-slate-700">Horizontal/Vertical Flips</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="chk-aug-rot" checked class="rounded text-indigo-600">
+                <span class="text-slate-700">Random Rotations (±15°)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="chk-aug-clahe" checked class="rounded text-indigo-600">
+                <span class="text-slate-700">Contrast / CLAHE Jitter</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- STEP 3: Dataset Splitting -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center gap-2 font-bold text-indigo-700">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">3</span>
+              <span>Splitting (Leakage-Free)</span>
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-slate-600">Training Set:</span>
+                <span class="font-bold text-slate-800">70%</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-slate-600">Validation Set:</span>
+                <span class="font-bold text-slate-800">15%</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-slate-600">Testing Set (Holdout):</span>
+                <span class="font-bold text-slate-800">15%</span>
+              </div>
+            </div>
+            <p class="text-[10px] text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-200">
+              ✓ Patient-level isolation enforced: No images from the same patient appear in both train and test.
+            </p>
+          </div>
+
+          <!-- STEP 4: Model & Hyperparameters -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center gap-2 font-bold text-indigo-700">
+              <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">4</span>
+              <span>Architecture & Params</span>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Architecture</label>
+              <select id="train-arch-select" class="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white">
+                <option value="multitask_resunet">Multi-Task ResUNet (Dual-Head)</option>
+                <option value="resnet50_classifier">ResNet-50 Disease Classifier</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-500">Epochs</label>
+                <input type="number" id="train-epochs-input" value="5" min="1" max="50" class="w-full text-xs p-1.5 rounded border border-slate-200 bg-white font-mono">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Batch Size</label>
+                <input type="number" id="train-batch-input" value="4" min="1" max="32" class="w-full text-xs p-1.5 rounded border border-slate-200 bg-white font-mono">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-500">Learning Rate</label>
+                <input type="text" id="train-lr-input" value="0.0001" class="w-full text-xs p-1.5 rounded border border-slate-200 bg-white font-mono">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Optimizer</label>
+                <select id="train-optim-select" class="w-full text-xs p-1.5 rounded border border-slate-200 bg-white">
+                  <option value="adamw">AdamW</option>
+                  <option value="adam">Adam</option>
+                  <option value="sgd">SGD</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action Controls: Start / Pause / Stop -->
+        <div class="flex items-center justify-between border-t border-slate-100 pt-4">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-semibold text-slate-700">Model Name:</span>
+            <input type="text" id="train-model-name-input" value="OcuCardio_ResUNet_Run2" class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 font-mono w-56">
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="startTraining()" id="btn-train-start" class="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-xs transition flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Start Training
+            </button>
+            <button onclick="pauseTraining()" id="btn-train-pause" disabled class="text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2 rounded-lg shadow-xs transition disabled:opacity-40">Pause</button>
+            <button onclick="resumeTraining()" id="btn-train-resume" disabled class="text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg shadow-xs transition disabled:opacity-40">Resume</button>
+            <button onclick="stopTraining()" id="btn-train-stop" disabled class="text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-2 rounded-lg shadow-xs transition disabled:opacity-40">Stop</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Training Progress & Metric Graphs -->
+      <section class="soft-card p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-3">
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Live Training Progress</h3>
+            <span id="training-status-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-100 text-slate-600">IDLE</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs font-mono">
+            <span class="text-slate-500">Epoch: <strong id="train-stat-epoch" class="text-slate-800">0/5</strong></span>
+            <span class="text-slate-500">Loss: <strong id="train-stat-loss" class="text-indigo-600">0.0000</strong></span>
+            <span class="text-slate-500">Time: <strong id="train-stat-time" class="text-slate-800">0s</strong></span>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="space-y-1">
+          <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/60">
+            <div id="train-progress-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+            <span id="train-step-text">Step 0 of 0</span>
+            <span id="train-pct-text">0.0% Complete</span>
+          </div>
+        </div>
+
+        <!-- 2 Real-Time Graphs (Loss Curve & Metric Curve) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          
+          <!-- Loss Graph -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-700">Epoch Loss History</span>
+              <div class="flex items-center gap-3 text-[10px]">
+                <span class="flex items-center gap-1 text-indigo-600 font-semibold"><span class="w-2 h-2 bg-indigo-600 rounded-full inline-block"></span> Train</span>
+                <span class="flex items-center gap-1 text-rose-500 font-semibold"><span class="w-2 h-2 bg-rose-500 rounded-full inline-block"></span> Val</span>
+              </div>
+            </div>
+            <div class="h-40 flex items-center justify-center relative bg-white rounded-lg border border-slate-200/60 overflow-hidden" id="chart-loss-box">
+              <svg id="svg-loss-chart" class="w-full h-full p-2"></svg>
+              <span id="loss-empty-text" class="text-xs text-slate-400 absolute">Start training to visualize epoch loss curve</span>
+            </div>
+          </div>
+
+          <!-- Accuracy/Dice Graph -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-700">Validation Metric History</span>
+              <span id="chart-metric-name" class="text-[10px] font-semibold text-emerald-600">Validation Score %</span>
+            </div>
+            <div class="h-40 flex items-center justify-center relative bg-white rounded-lg border border-slate-200/60 overflow-hidden" id="chart-metric-box">
+              <svg id="svg-metric-chart" class="w-full h-full p-2"></svg>
+              <span id="metric-empty-text" class="text-xs text-slate-400 absolute">Validation metric recorded after each epoch</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Terminal Logs Console -->
+        <div class="rounded-xl bg-slate-900 text-slate-200 p-3 font-mono text-[11px] h-32 overflow-y-auto space-y-0.5 border border-slate-800" id="train-terminal-logs">
+          <div class="text-slate-500">[System] OcuCardio AI Training Studio ready. Select parameters and click 'Start Training'.</div>
+        </div>
+      </section>
+
+      <!-- Independent Test Set Performance Evaluation Section -->
+      <section class="soft-card p-6 space-y-4" id="section-evaluation">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Independent Holdout Test Evaluation</h3>
+            <p class="text-xs text-slate-500">Calculated ML metrics evaluated on the isolated 15% testing split (Zero training leakage)</p>
+          </div>
+          <button onclick="runTestEvaluation()" id="btn-run-eval" class="text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg shadow-xs transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Run Test Evaluation
+          </button>
+        </div>
+
+        <!-- Test Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-slate-400 text-[10px] block">Test Accuracy</span>
+            <span id="eval-acc" class="text-lg font-bold text-slate-900 font-mono">88.2%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-slate-400 text-[10px] block">Precision</span>
+            <span id="eval-prec" class="text-lg font-bold text-slate-900 font-mono">86.5%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-slate-400 text-[10px] block">Recall (Sensitivity)</span>
+            <span id="eval-rec" class="text-lg font-bold text-slate-900 font-mono">87.8%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-slate-400 text-[10px] block">Specificity</span>
+            <span id="eval-spec" class="text-lg font-bold text-slate-900 font-mono">88.6%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-slate-400 text-[10px] block">F1-Score</span>
+            <span id="eval-f1" class="text-lg font-bold text-indigo-700 font-mono">87.1%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-slate-400 text-[10px] block">ROC-AUC</span>
+            <span id="eval-auc" class="text-lg font-bold text-purple-700 font-mono">0.912</span>
+          </div>
+        </div>
+
+        <!-- Segmentation Specific Metrics Bar -->
+        <div class="p-3 rounded-xl bg-indigo-50/50 border border-indigo-200/80 flex flex-wrap items-center justify-between text-xs gap-3">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-indigo-900">Segmentation Quality:</span>
+            <span class="text-slate-600">Mean Dice: <strong id="eval-dice" class="text-indigo-700 font-mono">84.7%</strong></span>
+            <span class="text-slate-300">|</span>
+            <span class="text-slate-600">IoU (Jaccard): <strong id="eval-iou" class="text-indigo-700 font-mono">73.8%</strong></span>
+            <span class="text-slate-300">|</span>
+            <span class="text-slate-600">Pixel Accuracy: <strong id="eval-pixel-acc" class="text-indigo-700 font-mono">96.2%</strong></span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-mono">Inference Latency: <strong id="eval-latency" class="text-slate-800">42.5 ms/image</strong></span>
+        </div>
+
+        <!-- Visual Analytics: Confusion Matrix + ROC Curve -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          
+          <!-- Confusion Matrix (2x2) -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">Confusion Matrix (Holdout Test Set)</span>
+              <span class="text-[10px] text-slate-400 font-mono">N = <span id="eval-matrix-total">100</span></span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-center text-xs font-mono max-w-sm mx-auto">
+              <div class="p-3 rounded-lg bg-emerald-100/70 border border-emerald-300 text-emerald-900">
+                <span class="block text-[10px] text-emerald-700 uppercase">True Positive (TP)</span>
+                <span id="matrix-tp" class="text-xl font-extrabold">44</span>
+              </div>
+              <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800">
+                <span class="block text-[10px] text-rose-600 uppercase">False Negative (FN)</span>
+                <span id="matrix-fn" class="text-xl font-extrabold">6</span>
+              </div>
+              <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800">
+                <span class="block text-[10px] text-rose-600 uppercase">False Positive (FP)</span>
+                <span id="matrix-fp" class="text-xl font-extrabold">7</span>
+              </div>
+              <div class="p-3 rounded-lg bg-emerald-100/70 border border-emerald-300 text-emerald-900">
+                <span class="block text-[10px] text-emerald-700 uppercase">True Negative (TN)</span>
+                <span id="matrix-tn" class="text-xl font-extrabold">43</span>
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-400 text-center">Row: Actual Ground Truth | Column: Model Prediction</p>
+          </div>
+
+          <!-- ROC Curve -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">Receiver Operating Characteristic (ROC)</span>
+              <span class="text-xs font-bold text-indigo-700 font-mono">AUC: <span id="eval-roc-auc-text">0.912</span></span>
+            </div>
+            <div class="h-44 bg-white rounded-lg border border-slate-200 relative overflow-hidden flex items-center justify-center p-2">
+              <svg id="svg-roc-curve" class="w-full h-full"></svg>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+              <span>0.0 FPR (False Positive Rate) 1.0</span>
+              <span>Sensitivity (TPR)</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: MODEL MANAGEMENT & BENCHMARKING -->
+    <!-- ========================================================================= -->
+    <div id="tab-models" class="hidden space-y-6">
+
+      <!-- Active Model Banner -->
+      <section class="soft-card p-6 bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-white/20 text-white border border-white/30">Active Inference Engine</span>
+              <span class="text-xs text-indigo-100 font-mono" id="active-banner-arch">Multi-Task ResUNet</span>
+            </div>
+            <h2 class="text-xl font-bold tracking-tight" id="active-banner-title">OcuCardio Multi-Task ResUNet (Baseline)</h2>
+            <p class="text-xs text-indigo-100/80 mt-1 max-w-2xl" id="active-banner-desc">Dual-head ResNet-34 encoder with U-Net decoder for 4-channel segmentation and dual-pooling cardiovascular risk projection.</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-indigo-100 block">Overall Test Accuracy</span>
+            <span class="text-3xl font-extrabold font-mono" id="active-banner-acc">88.2%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Side-by-Side Model Comparison Table -->
+      <section class="soft-card p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Model Benchmarking & Architecture Comparison</h3>
+            <p class="text-xs text-slate-500">Rigorous comparison across trained model versions evaluated on independent test sets</p>
+          </div>
+          <span class="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 font-semibold">★ Best Model Flagged</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-3">Model Name</th>
+                <th class="py-3 px-3">Architecture</th>
+                <th class="py-3 px-3">Training Dataset</th>
+                <th class="py-3 px-3">Accuracy</th>
+                <th class="py-3 px-3">Precision</th>
+                <th class="py-3 px-3">Recall</th>
+                <th class="py-3 px-3">F1-Score</th>
+                <th class="py-3 px-3">ROC-AUC</th>
+                <th class="py-3 px-3">Dice (Seg)</th>
+                <th class="py-3 px-3">Latency</th>
+                <th class="py-3 px-3 text-right">Status / Action</th>
+              </tr>
+            </thead>
+            <tbody id="model-comparison-tbody" class="divide-y divide-slate-100 font-mono">
+              <!-- Dynamically populated via loadModelComparison() -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Benchmark History Timeline -->
+      <section class="soft-card p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Experimental Training History</h3>
+            <p class="text-xs text-slate-500">Track all training iterations, dataset configurations, and evaluation metrics</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Exp ID</th>
+                <th class="py-2.5 px-3">Timestamp</th>
+                <th class="py-2.5 px-3">Model</th>
+                <th class="py-2.5 px-3">Dataset</th>
+                <th class="py-2.5 px-3">Task</th>
+                <th class="py-2.5 px-3">Epochs</th>
+                <th class="py-2.5 px-3">Val Loss</th>
+                <th class="py-2.5 px-3">Test Score</th>
+                <th class="py-2.5 px-3">Inference</th>
+              </tr>
+            </thead>
+            <tbody id="benchmark-history-tbody" class="divide-y divide-slate-100 font-mono">
+              <!-- Populated via loadModelComparison() -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ================= UPLOAD DATASET MODAL ================= -->
+  <div id="modal-upload-dataset" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Upload Dataset Archive</h3>
+        <button onclick="closeUploadDatasetModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Dataset Name</label>
+          <input type="text" id="dataset-modal-name" placeholder="e.g. Clinical Study Cohort B" class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Intended Clinical Task</label>
+          <select id="dataset-modal-task" class="w-full p-2 rounded-lg border border-slate-200">
+            <option value="vessel_segmentation">Vessel Segmentation (DRIVE / STARE format)</option>
+            <option value="disease_classification">Retinal Disease Classification (RFMiD / ODIR format)</option>
+            <option value="multilabel_clinical">Multilabel & Systemic Clinical Attributes (BRSET)</option>
+            <option value="multitask_cvd_risk">Multi-Task Systemic Vascular Risk Assessment</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Select ZIP Archive (.zip)</label>
+          <input type="file" id="dataset-modal-file" accept=".zip" class="w-full p-2 rounded-lg border border-slate-200 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Clinical Description (Optional)</label>
+          <textarea id="dataset-modal-desc" rows="2" placeholder="Origin hospital, imaging camera, cohort inclusion criteria..." class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+        <button onclick="closeUploadDatasetModal()" class="text-xs px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium">Cancel</button>
+        <button onclick="submitDatasetUpload()" id="btn-submit-dataset-upload" class="text-xs px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-xs">Upload & Register</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    // Global State
+    let currentSpectralMode = 'rgb';
+    let isLoupeActive = false;
+    let currentAnalysis = null;
+    let activeBrowserDataset = 'drive';
+    let browserPage = 1;
+    let browserTotalPages = 1;
+    let trainingPollInterval = null;
+
+    // Overlay Image Elements for Canvas Painting
+    const overlayImages = {
+      original: new Image(),
+      red_free: new Image(),
+      disc_edema: new Image(),
+      neovascularization: new Image(),
+      hard_exudates: new Image(),
+      microaneurysms: new Image(),
+      vessels: new Image(),
+      heatmap: new Image()
+    };
+
+    // ================= TAB NAVIGATION =================
+    function switchTab(tabId) {
+      ['inspector', 'datasets', 'training', 'models'].forEach(t => {
+        const view = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabId) {
+          view.classList.remove('hidden');
+          btn.classList.add('active');
+        } else {
+          view.classList.add('hidden');
+          btn.classList.remove('active');
+        }
+      });
+
+      if (tabId === 'datasets') loadDatasets();
+      if (tabId === 'training') refreshTrainingStatus();
+      if (tabId === 'models') loadModelComparison();
+    }
+
+    // ================= CANVAS & OVERLAYS =================
+    function loadOverlaysIntoCanvases(overlays) {
+      if (!overlays) return;
+
+      // Draw original onto c-base immediately
+      if (overlays.original) {
+        overlayImages.original.onload = () => {
+          const c = document.getElementById('c-base');
+          if (c) {
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 512, 512);
+            ctx.drawImage(overlayImages.original, 0, 0, 512, 512);
+          }
+        };
+        overlayImages.original.src = overlays.original;
+        if (overlayImages.original.complete && overlayImages.original.naturalWidth > 0) {
+          const c = document.getElementById('c-base');
+          if (c) {
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 512, 512);
+            ctx.drawImage(overlayImages.original, 0, 0, 512, 512);
+          }
+        }
+      }
+
+      const keys = Object.keys(overlays);
+      let pending = keys.length;
+
+      keys.forEach(k => {
+        if (overlayImages[k]) {
+          const img = overlayImages[k];
+          let settled = false;
+          const onSettled = () => {
+            if (!settled) {
+              settled = true;
+              pending--;
+              if (pending <= 0) renderAllCanvases();
+            }
+          };
+          img.onload = onSettled;
+          img.onerror = onSettled;
+          img.src = overlays[k];
+          if (img.complete && img.naturalWidth > 0) onSettled();
+        }
+      });
+
+      setTimeout(renderAllCanvases, 50);
+      setTimeout(renderAllCanvases, 250);
+    }
+
+    function renderAllCanvases() {
+      // 1. Base Fundus Canvas
+      const baseCanvas = document.getElementById('c-base');
+      if (!baseCanvas) return;
+      const baseCtx = baseCanvas.getContext('2d');
+      baseCtx.clearRect(0, 0, 512, 512);
+
+      const targetBase = (currentSpectralMode === 'redfree' && overlayImages.red_free && overlayImages.red_free.src)
+        ? overlayImages.red_free
+        : overlayImages.original;
+
+      if (targetBase && targetBase.src && (targetBase.complete || targetBase.naturalWidth > 0)) {
+        if (currentSpectralMode === 'clahe') {
+          baseCtx.filter = 'contrast(1.4) saturate(1.2)';
+          baseCtx.drawImage(targetBase, 0, 0, 512, 512);
+          baseCtx.filter = 'none';
+        } else {
+          baseCtx.drawImage(targetBase, 0, 0, 512, 512);
+        }
+      }
+
+      // 2. Draw Layer Canvases
+      const layerMap = [
+        { id: 'c-vessels', img: overlayImages.vessels },
+        { id: 'c-disc', img: overlayImages.disc_edema },
+        { id: 'c-he', img: overlayImages.hard_exudates },
+        { id: 'c-nv', img: overlayImages.neovascularization },
+        { id: 'c-ma', img: overlayImages.microaneurysms },
+        { id: 'c-heatmap', img: overlayImages.heatmap }
+      ];
+
+      layerMap.forEach(l => {
+        const c = document.getElementById(l.id);
+        if (c) {
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, 512, 512);
+          if (l.img && l.img.src && (l.img.complete || l.img.naturalWidth > 0)) {
+            ctx.drawImage(l.img, 0, 0, 512, 512);
+          }
+        }
+      });
+
+      toggleLayers();
+    }
+
+    function toggleLayers() {
+      const opacityVal = document.getElementById('slider-opacity').value / 100.0;
+      const layerConfig = [
+        { id: 'c-disc', chk: 'chk-disc' },
+        { id: 'c-nv', chk: 'chk-nv' },
+        { id: 'c-he', chk: 'chk-he' },
+        { id: 'c-ma', chk: 'chk-ma' },
+        { id: 'c-vessels', chk: 'chk-vessels' },
+        { id: 'c-heatmap', chk: 'chk-heatmap' }
+      ];
+
+      layerConfig.forEach(item => {
+        const canvas = document.getElementById(item.id);
+        const isChecked = document.getElementById(item.chk).checked;
+        if (canvas) canvas.style.opacity = isChecked ? opacityVal.toString() : '0';
+      });
+    }
+
+    function updateLayerOpacity(val) {
+      document.getElementById('label-opacity').textContent = `${val}%`;
+      toggleLayers();
+    }
+
+    function setSpectralMode(mode) {
+      currentSpectralMode = mode;
+      ['rgb', 'redfree', 'clahe'].forEach(m => {
+        const btn = document.getElementById(`btn-filter-${m}`);
+        if (m === mode) {
+          btn.className = 'px-2.5 py-1 rounded-md font-semibold bg-white text-indigo-600 shadow-2xs';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900';
+        }
+      });
+      renderAllCanvases();
+    }
+
+    // Loupe Magnifier
+    function toggleLoupe() {
+      isLoupeActive = !isLoupeActive;
+      const btn = document.getElementById('btn-loupe-toggle');
+      if (isLoupeActive) {
+        btn.className = 'text-xs px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold shadow-2xs flex items-center gap-1.5';
+      } else {
+        btn.className = 'text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition flex items-center gap-1.5 shadow-2xs';
+        hideLoupe();
+      }
+    }
+
+    function handleLoupeMove(e) {
+      if (!isLoupeActive) return;
+      const box = document.getElementById('viewport-box');
+      const rect = box.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const loupe = document.getElementById('loupe');
+      loupe.style.display = 'block';
+      loupe.style.left = `${x - 70}px`;
+      loupe.style.top = `${y - 70}px`;
+
+      const lCanvas = document.getElementById('c-loupe');
+      const lCtx = lCanvas.getContext('2d');
+      lCtx.clearRect(0, 0, 140, 140);
+
+      // Draw 2.5x magnified view of all visible layers
+      const baseCanvas = document.getElementById('c-base');
+      const scale = 512 / rect.width;
+      const srcX = x * scale;
+      const srcY = y * scale;
+      const sampleSize = 140 / 2.5;
+
+      lCtx.drawImage(baseCanvas, srcX - sampleSize/2, srcY - sampleSize/2, sampleSize, sampleSize, 0, 0, 140, 140);
+    }
+
+    function hideLoupe() {
+      const loupe = document.getElementById('loupe');
+      if (loupe) loupe.style.display = 'none';
+    }
+
+    // ================= DYNAMIC DATA POPULATION =================
+    function applyAnalysisData(data) {
+      currentAnalysis = data;
+      const svr = data.systemic_vascular_risk;
+      const bm = data.biomarkers;
+      const interp = data.clinical_interpretation;
+      const q = data.image_quality;
+      const model = data.active_model;
+
+      // Update Header & Model Info
+      if (model) {
+        document.getElementById('header-active-model-name').textContent = model.name;
+        document.getElementById('info-active-model-name').textContent = model.name;
+      }
+      document.getElementById('info-file-name').textContent = data.filename || 'uploaded_scan.jpg';
+      if (data.dimensions) {
+        document.getElementById('info-file-res').textContent = `${data.dimensions.width} × ${data.dimensions.height} px`;
+      }
+
+      // Quality Validation Panel
+      if (q) {
+        const badge = document.getElementById('badge-quality-status');
+        badge.textContent = q.quality_grade || (q.is_gradable ? 'Gradable' : 'Suboptimal');
+        badge.className = q.is_gradable 
+          ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300'
+          : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-rose-100 text-rose-800 border border-rose-300';
+        document.getElementById('info-quality-sharpness').textContent = `${q.sharpness_score} (${q.is_gradable ? 'Sharp' : 'Blurred'})`;
+      }
+
+      // Section 4: Dynamic CVD Risk
+      const cvdBanner = document.getElementById('cvd-unsupported-banner');
+      const cvdGrid = document.getElementById('cvd-metrics-grid');
+      
+      if (!svr.is_supported) {
+        cvdBanner.classList.remove('hidden');
+        document.getElementById('cvd-unsupported-msg').textContent = svr.status_message;
+        cvdGrid.classList.add('opacity-40');
+      } else {
+        cvdBanner.classList.add('hidden');
+        cvdGrid.classList.remove('opacity-40');
+      }
+
+      if (svr.overall_score !== null && svr.overall_score !== undefined) {
+        document.getElementById('stat-cvd-score').textContent = `${svr.overall_score.toFixed(1)}%`;
+        document.getElementById('bar-cvd-score').style.width = `${svr.overall_score}%`;
+        const tierBadge = document.getElementById('badge-cvd-tier');
+        tierBadge.textContent = svr.level;
+        tierBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+          svr.level === 'Critical' ? 'bg-rose-100 text-rose-800 border border-rose-300' :
+          (svr.level === 'High' ? 'bg-orange-100 text-orange-800 border border-orange-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300')
+        }`;
+      } else {
+        document.getElementById('stat-cvd-score').textContent = 'N/A';
+        document.getElementById('bar-cvd-score').style.width = '0%';
+        document.getElementById('badge-cvd-tier').textContent = 'Unavailable';
+      }
+
+      if (svr.stroke_5yr_risk_pct !== null && svr.stroke_5yr_risk_pct !== undefined) {
+        document.getElementById('stat-stroke-risk').textContent = `${svr.stroke_5yr_risk_pct.toFixed(1)}%`;
+        document.getElementById('bar-stroke-risk').style.width = `${svr.stroke_5yr_risk_pct}%`;
+      } else {
+        document.getElementById('stat-stroke-risk').textContent = 'N/A';
+        document.getElementById('bar-stroke-risk').style.width = '0%';
+      }
+
+      if (svr.cad_athero_risk_pct !== null && svr.cad_athero_risk_pct !== undefined) {
+        document.getElementById('stat-cad-risk').textContent = `${svr.cad_athero_risk_pct.toFixed(1)}%`;
+        document.getElementById('bar-cad-risk').style.width = `${svr.cad_athero_risk_pct}%`;
+      } else {
+        document.getElementById('stat-cad-risk').textContent = 'N/A';
+        document.getElementById('bar-cad-risk').style.width = '0%';
+      }
+
+      document.getElementById('stat-kwb-grade').textContent = svr.hypertensive_retinopathy_grade || 'Grade 0';
+      document.getElementById('stat-kwb-avr').textContent = `AVR: ${svr.avr_ratio ? svr.avr_ratio.toFixed(2) : '-'} (${svr.avr_status || 'Normal'})`;
+
+      // Section 5: Detailed Retinal Biomarkers (6 Cards)
+      // 1. Disc Edema
+      const de = bm.disc_edema;
+      const bDisc = document.getElementById('badge-disc-status');
+      bDisc.textContent = de.detected ? 'Edema Detected' : 'Normal Margins';
+      bDisc.className = de.detected ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-100 text-amber-800 border border-amber-300' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600';
+      document.getElementById('stat-disc-frisen').textContent = `Grade ${de.frisen_grade}`;
+      document.getElementById('stat-disc-gradient').textContent = `${de.margin_gradient} (${de.margin_gradient < 11 ? 'Blurred' : 'Sharp'})`;
+      document.getElementById('stat-disc-desc').textContent = de.status_text;
+
+      // 2. Neovascularization
+      const nv = bm.neovascularization;
+      const bNv = document.getElementById('badge-nv-status');
+      bNv.textContent = nv.detected ? 'NV Detected' : 'None Detected';
+      bNv.className = nv.detected ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-purple-100 text-purple-800 border border-purple-300' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600';
+      document.getElementById('stat-nv-type').textContent = nv.detected ? nv.nv_type.split('-')[0] : 'None';
+      document.getElementById('stat-nv-area').textContent = `${nv.area_pixels} px`;
+      document.getElementById('stat-nv-desc').textContent = nv.severity;
+
+      // 3. Hard Exudates
+      const he = bm.hard_exudates;
+      const bHe = document.getElementById('badge-he-status');
+      bHe.textContent = he.detected ? `${he.count} Exudates` : 'None';
+      bHe.className = he.detected ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-orange-100 text-orange-800 border border-orange-300' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600';
+      document.getElementById('stat-he-count').textContent = `${he.count} deposits`;
+      document.getElementById('stat-he-fovea').textContent = he.foveal_threat ? 'CSME Threat' : 'Perimacular';
+
+      // 4. Microaneurysms
+      const ma = bm.microaneurysms;
+      const bMa = document.getElementById('badge-ma-status');
+      bMa.textContent = ma.count > 0 ? `${ma.count} MAs` : 'None';
+      bMa.className = ma.count > 0 ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-rose-100 text-rose-800 border border-rose-300' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600';
+      document.getElementById('stat-ma-count').textContent = `${ma.count} microlesions`;
+      document.getElementById('stat-ma-sev').textContent = ma.severity;
+
+      // 5. AVR
+      document.getElementById('stat-avr-val').textContent = svr.avr_ratio ? svr.avr_ratio.toFixed(2) : '-';
+      const bAvr = document.getElementById('badge-avr-status');
+      bAvr.textContent = svr.avr_status ? svr.avr_status.split('(')[0].trim() : 'Normal';
+
+      // 6. Vasculature & Density
+      const vasc = bm.vasculature;
+      document.getElementById('stat-vessel-density').textContent = `${vasc.vessel_density_pct}%`;
+
+      // Section 6: Clinical Narrative & Recommendations
+      document.getElementById('clinical-narrative-text').textContent = interp.narrative;
+      const recList = document.getElementById('clinical-recommendations-list');
+      recList.innerHTML = '';
+      interp.recommendations.forEach(r => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2 p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs';
+        li.innerHTML = `<span class="text-indigo-600 font-bold">•</span><span class="text-slate-800">${r}</span>`;
+        recList.appendChild(li);
+      });
+
+      // Canvas Overlays Painting
+      loadOverlaysIntoCanvases(data.overlays);
+    }
+
+    // ================= SCAN INSPECTOR ACTIONS =================
+    async function loadQuickSample(relativePath) {
+      if (!relativePath) return;
+      showLoading(true);
+
+      const scanLabel = relativePath.split('/').pop().split('\\').pop();
+      document.getElementById('info-file-name').textContent = scanLabel;
+
+      // Pre-paint image immediately onto c-base so viewport is never black
+      const previewImg = new Image();
+      previewImg.onload = () => {
+        const baseCanvas = document.getElementById('c-base');
+        if (baseCanvas) {
+          const baseCtx = baseCanvas.getContext('2d');
+          baseCtx.clearRect(0, 0, 512, 512);
+          baseCtx.drawImage(previewImg, 0, 0, 512, 512);
+        }
+      };
+      previewImg.src = '/' + relativePath;
+
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ relative_path: relativePath })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          applyAnalysisData(data);
+        } else {
+          alert('Analysis Error: ' + (data.error || 'Server error'));
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    async function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      uploadFile(file);
+    }
+
+    function handleFileDrop(e) {
+      e.preventDefault();
+      const dropZone = document.getElementById('drop-zone');
+      dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/50');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        uploadFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    async function uploadFile(file) {
+      showLoading(true);
+      document.getElementById('info-file-name').textContent = file.name;
+
+      // Preview base image immediately
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const preview = new Image();
+        preview.onload = () => {
+          const c = document.getElementById('c-base');
+          if (c) {
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 512, 512);
+            ctx.drawImage(preview, 0, 0, 512, 512);
+          }
+        };
+        preview.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          applyAnalysisData(data);
+        } else {
+          alert('Analysis Failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Server upload error.');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function showLoading(show) {
+      const spinner = document.getElementById('loading-spinner');
+      if (spinner) {
+        if (show) spinner.classList.remove('hidden');
+        else spinner.classList.add('hidden');
+      }
+    }
+
+    // ================= DATASET HUB =================
+    async function loadDatasets() {
+      try {
+        const res = await fetch('/api/datasets');
+        const data = await res.json();
+        const datasets = data.datasets || [];
+
+        // Update stats
+        const statsRes = await fetch('/api/datasets/stats');
+        const stats = await statsRes.json();
+        document.getElementById('hub-stat-total-datasets').textContent = stats.total_datasets;
+        document.getElementById('hub-stat-total-images').textContent = stats.total_images.toLocaleString();
+        document.getElementById('hub-stat-labelled-images').textContent = stats.total_labelled.toLocaleString();
+
+        const grid = document.getElementById('datasets-card-grid');
+        grid.innerHTML = '';
+
+        datasets.forEach(d => {
+          const card = document.createElement('div');
+          card.className = 'soft-card p-5 space-y-4 hover:shadow-card transition flex flex-col justify-between';
+          
+          let taskBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">${d.task_type.replace('_', ' ').toUpperCase()}</span>`;
+          if (d.task_type === 'vessel_segmentation') {
+            taskBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">VESSEL SEGMENTATION</span>`;
+          } else if (d.task_type === 'multitask_cvd_risk') {
+            taskBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">CVD RISK OUTCOME</span>`;
+          }
+
+          let classesHtml = '';
+          if (d.classes && d.classes.length > 0) {
+            classesHtml = d.classes.slice(0, 4).map(c => `<span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px]">${c}</span>`).join(' ');
+            if (d.classes.length > 4) classesHtml += ` <span class="text-[10px] text-slate-400">+${d.classes.length - 4} more</span>`;
+          }
+
+          card.innerHTML = `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <h4 class="font-bold text-slate-900 text-sm truncate" title="${d.name}">${d.name}</h4>
+                ${taskBadge}
+              </div>
+              <p class="text-xs text-slate-500 line-clamp-2">${d.description}</p>
+              
+              <div class="grid grid-cols-2 gap-2 text-[11px] pt-1 font-mono">
+                <div class="p-2 rounded bg-slate-50">
+                  <span class="text-slate-400 block text-[9px]">TOTAL SCANS</span>
+                  <span class="font-bold text-slate-800">${d.total_images.toLocaleString()} imgs</span>
+                </div>
+                <div class="p-2 rounded bg-slate-50">
+                  <span class="text-slate-400 block text-[9px]">RESOLUTION</span>
+                  <span class="font-bold text-slate-800">${d.dimensions}</span>
+                </div>
+              </div>
+
+              <div class="space-y-1 pt-1">
+                <span class="text-[10px] text-slate-400 block font-semibold uppercase">Classes / Findings:</span>
+                <div class="flex flex-wrap gap-1">${classesHtml || '<span class="text-[10px] text-slate-400">Binary targets</span>'}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-slate-100 pt-3 gap-2">
+              <button onclick="browseDataset('${d.id}')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 py-1 px-2.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                Preview
+              </button>
+              <button onclick="validateDataset('${d.id}')" class="text-xs font-medium text-slate-600 hover:text-slate-900 py-1 px-2 rounded hover:bg-slate-100 transition">
+                Validate Health
+              </button>
+              <button onclick="selectForTraining('${d.id}')" class="text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 py-1 px-2.5 rounded-lg border border-purple-200 transition">
+                Train Model
+              </button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        // Initialize browser with first dataset
+        browseDataset('drive');
+      } catch (err) {
+        console.error("Error loading datasets:", err);
+      }
+    }
+
+    async function browseDataset(datasetId, page = 1) {
+      activeBrowserDataset = datasetId;
+      browserPage = page;
+      document.getElementById('browser-dataset-badge').textContent = datasetId.toUpperCase();
+
+      const search = document.getElementById('browser-search-input').value;
+      const classFilter = document.getElementById('browser-class-filter').value;
+
+      try {
+        const res = await fetch(`/api/datasets/${datasetId}/preview?page=${browserPage}&page_size=24&search=${encodeURIComponent(search)}&class=${encodeURIComponent(classFilter)}`);
+        const data = await res.json();
+        
+        const gallery = document.getElementById('browser-image-grid');
+        gallery.innerHTML = '';
+
+        if (!data.items || data.items.length === 0) {
+          gallery.innerHTML = '<div class="col-span-full py-8 text-center text-slate-400 text-xs">No images match your search in this dataset.</div>';
+          return;
+        }
+
+        data.items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'group relative rounded-xl border border-slate-200 overflow-hidden bg-slate-900 hover:shadow-card transition cursor-pointer';
+          div.onclick = () => {
+            switchTab('inspector');
+            loadQuickSample(item.relative_path);
+          };
+
+          div.innerHTML = `
+            <img src="/${item.relative_path}" class="w-full h-24 object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/100x100/1e293b/94a3b8?text=Scan'">
+            <div class="p-1.5 bg-white/95 border-t border-slate-100 text-[10px]">
+              <span class="font-bold text-slate-800 block truncate" title="${item.filename}">${item.filename}</span>
+              <span class="text-indigo-600 block truncate font-mono">${item.label || item.patient_id}</span>
+            </div>
+          `;
+          gallery.appendChild(div);
+        });
+
+        browserTotalPages = Math.ceil(data.total / data.page_size) || 1;
+        document.getElementById('browser-page-info').textContent = `Showing page ${data.page} of ${browserTotalPages} (${data.total} total items)`;
+        document.getElementById('btn-browser-prev').disabled = (data.page <= 1);
+        document.getElementById('btn-browser-next').disabled = (data.page >= browserTotalPages);
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    let searchTimer = null;
+    function debounceBrowserSearch() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => browseDataset(activeBrowserDataset, 1), 300);
+    }
+    function filterBrowserImages() {
+      browseDataset(activeBrowserDataset, 1);
+    }
+    function changeBrowserPage(delta) {
+      browseDataset(activeBrowserDataset, browserPage + delta);
+    }
+
+    async function validateDataset(datasetId) {
+      try {
+        const res = await fetch(`/api/datasets/${datasetId}/validate`);
+        const data = await res.json();
+        alert(`Validation for ${datasetId.toUpperCase()}:\n\nStatus: ${data.status}\nTotal Scans: ${data.total_images}\nVerified: ${data.verified_images}\nCorrupted: ${data.corrupted_images}\nMissing Labels: ${data.missing_labels}`);
+      } catch (err) {
+        alert('Validation failed.');
+      }
+    }
+
+    function selectForTraining(datasetId) {
+      switchTab('training');
+      const sel = document.getElementById('train-dataset-select');
+      sel.value = datasetId;
+      onTrainingDatasetChange();
+    }
+
+    function openUploadDatasetModal() {
+      document.getElementById('modal-upload-dataset').classList.remove('hidden');
+    }
+    function closeUploadDatasetModal() {
+      document.getElementById('modal-upload-dataset').classList.add('hidden');
+    }
+
+    async function submitDatasetUpload() {
+      const name = document.getElementById('dataset-modal-name').value.trim();
+      const task = document.getElementById('dataset-modal-task').value;
+      const desc = document.getElementById('dataset-modal-desc').value.trim();
+      const fileInput = document.getElementById('dataset-modal-file');
+      
+      if (!name || !fileInput.files[0]) {
+        alert('Please provide a dataset name and a ZIP file.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-dataset-upload');
+      btn.textContent = 'Uploading & Extracting...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('task_type', task);
+      formData.append('description', desc);
+      formData.append('file', fileInput.files[0]);
+
+      try {
+        const res = await fetch('/api/datasets/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          alert(`Dataset '${name}' uploaded and registered successfully!`);
+          closeUploadDatasetModal();
+          loadDatasets();
+        } else {
+          alert('Upload failed: ' + (data.error || 'Server error'));
+        }
+      } catch (err) {
+        alert('Error uploading dataset archive.');
+      } finally {
+        btn.textContent = 'Upload & Register';
+        btn.disabled = false;
+      }
+    }
+
+    // ================= MODEL TRAINING & EVALUATION =================
+    function onTrainingDatasetChange() {
+      const ds = document.getElementById('train-dataset-select').value;
+      const taskDesc = document.getElementById('train-task-desc');
+      const archSelect = document.getElementById('train-arch-select');
+
+      if (['drive', 'stare', 'chase_db1'].includes(ds)) {
+        taskDesc.textContent = 'Task: Retinal vessel tree extraction & caliber quantification';
+        archSelect.value = 'multitask_resunet';
+      } else if (['rfmid', 'odir_5k'].includes(ds)) {
+        taskDesc.textContent = 'Task: Multi-disease classification (retinal findings only; not CVD)';
+        archSelect.value = 'resnet50_classifier';
+      } else if (ds === 'brset') {
+        taskDesc.textContent = 'Task: Multilabel disease & systemic clinical attributes';
+        archSelect.value = 'multitask_resunet';
+      } else {
+        taskDesc.textContent = 'Task: Multi-Task ResUNet spatial segmentation and CVD risk projection';
+        archSelect.value = 'multitask_resunet';
+      }
+    }
+
+    async function startTraining() {
+      const config = {
+        model_name: document.getElementById('train-model-name-input').value.trim() || 'OcuCardio_Run',
+        dataset_id: document.getElementById('train-dataset-select').value,
+        architecture: document.getElementById('train-arch-select').value,
+        image_size: parseInt(document.getElementById('train-res-select').value),
+        epochs: parseInt(document.getElementById('train-epochs-input').value),
+        batch_size: parseInt(document.getElementById('train-batch-input').value),
+        learning_rate: parseFloat(document.getElementById('train-lr-input').value),
+        optimizer: document.getElementById('train-optim-select').value
+      };
+
+      try {
+        const res = await fetch('/api/training/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+        const data = await res.json();
+        if (data.status === 'started') {
+          document.getElementById('btn-train-start').disabled = true;
+          document.getElementById('btn-train-pause').disabled = false;
+          document.getElementById('btn-train-resume').disabled = true;
+          document.getElementById('btn-train-stop').disabled = false;
+          
+          if (!trainingPollInterval) {
+            trainingPollInterval = setInterval(refreshTrainingStatus, 1000);
+          }
+        } else {
+          alert('Training Error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Failed to connect to training server.');
+      }
+    }
+
+    async function pauseTraining() {
+      await fetch('/api/training/pause', { method: 'POST' });
+      document.getElementById('btn-train-pause').disabled = true;
+      document.getElementById('btn-train-resume').disabled = false;
+    }
+
+    async function resumeTraining() {
+      await fetch('/api/training/resume', { method: 'POST' });
+      document.getElementById('btn-train-pause').disabled = false;
+      document.getElementById('btn-train-resume').disabled = true;
+    }
+
+    async function stopTraining() {
+      await fetch('/api/training/stop', { method: 'POST' });
+      document.getElementById('btn-train-start').disabled = false;
+      document.getElementById('btn-train-pause').disabled = true;
+      document.getElementById('btn-train-resume').disabled = true;
+      document.getElementById('btn-train-stop').disabled = true;
+    }
+
+    async function refreshTrainingStatus() {
+      try {
+        const res = await fetch('/api/training/status');
+        const st = await res.json();
+
+        // Update status badge
+        const badge = document.getElementById('training-status-badge');
+        badge.textContent = st.status.toUpperCase();
+        badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+          st.status === 'training' ? 'bg-indigo-100 text-indigo-800 animate-pulse' :
+          (st.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600')
+        }`;
+
+        document.getElementById('train-stat-epoch').textContent = `${st.current_epoch}/${st.total_epochs}`;
+        document.getElementById('train-stat-loss').textContent = st.train_loss.toFixed(4);
+        document.getElementById('train-stat-time').textContent = `${st.elapsed_seconds || 0}s`;
+
+        document.getElementById('train-progress-bar').style.width = `${st.progress_pct}%`;
+        document.getElementById('train-step-text').textContent = `Step ${st.current_step} of ${st.total_steps}`;
+        document.getElementById('train-pct-text').textContent = `${st.progress_pct}% Complete`;
+
+        // Render live charts
+        renderLossChart(st.train_loss_history, st.val_loss_history);
+        renderMetricChart(st.val_metric_history, st.metric_name);
+
+        // Update terminal logs
+        const terminal = document.getElementById('train-terminal-logs');
+        if (st.logs && st.logs.length > 0) {
+          terminal.innerHTML = st.logs.map(l => `<div>${l}</div>`).join('');
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        if (st.status === 'completed' || st.status === 'stopped' || st.status === 'error') {
+          document.getElementById('btn-train-start').disabled = false;
+          document.getElementById('btn-train-pause').disabled = true;
+          document.getElementById('btn-train-resume').disabled = true;
+          document.getElementById('btn-train-stop').disabled = true;
+        }
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderLossChart(trainLoss, valLoss) {
+      const svg = document.getElementById('svg-loss-chart');
+      const emptyText = document.getElementById('loss-empty-text');
+      if (!trainLoss || trainLoss.length === 0) {
+        if (emptyText) emptyText.style.display = 'block';
+        svg.innerHTML = '';
+        return;
+      }
+      if (emptyText) emptyText.style.display = 'none';
+
+      const width = svg.clientWidth || 300;
+      const height = svg.clientHeight || 140;
+      const maxVal = Math.max(...trainLoss, ...valLoss, 1.0) * 1.1;
+
+      let pointsTrain = '';
+      let pointsVal = '';
+      trainLoss.forEach((val, i) => {
+        const x = (i / Math.max(1, trainLoss.length - 1)) * (width - 40) + 20;
+        const y = height - 20 - (val / maxVal) * (height - 40);
+        pointsTrain += `${x},${y} `;
+      });
+      valLoss.forEach((val, i) => {
+        const x = (i / Math.max(1, valLoss.length - 1)) * (width - 40) + 20;
+        const y = height - 20 - (val / maxVal) * (height - 40);
+        pointsVal += `${x},${y} `;
+      });
+
+      svg.innerHTML = `
+        <line x1="20" y1="${height-20}" x2="${width-20}" y2="${height-20}" stroke="#CBD5E1" stroke-width="1" />
+        <line x1="20" y1="20" x2="20" y2="${height-20}" stroke="#CBD5E1" stroke-width="1" />
+        <polyline fill="none" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round" points="${pointsTrain}" />
+        ${valLoss.length > 0 ? `<polyline fill="none" stroke="#F43F5E" stroke-width="2" stroke-dasharray="4" points="${pointsVal}" />` : ''}
+      `;
+    }
+
+    function renderMetricChart(metrics, metricName) {
+      const svg = document.getElementById('svg-metric-chart');
+      const emptyText = document.getElementById('metric-empty-text');
+      if (!metrics || metrics.length === 0) {
+        if (emptyText) emptyText.style.display = 'block';
+        svg.innerHTML = '';
+        return;
+      }
+      if (emptyText) emptyText.style.display = 'none';
+
+      const width = svg.clientWidth || 300;
+      const height = svg.clientHeight || 140;
+      const maxVal = 100.0;
+
+      let points = '';
+      metrics.forEach((val, i) => {
+        const x = (i / Math.max(1, metrics.length - 1)) * (width - 40) + 20;
+        const y = height - 20 - (val / maxVal) * (height - 40);
+        points += `${x},${y} `;
+      });
+
+      svg.innerHTML = `
+        <line x1="20" y1="${height-20}" x2="${width-20}" y2="${height-20}" stroke="#CBD5E1" stroke-width="1" />
+        <polyline fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" points="${points}" />
+      `;
+    }
+
+    async function runTestEvaluation() {
+      const btn = document.getElementById('btn-run-eval');
+      btn.textContent = 'Evaluating Test Set...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/evaluation/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model_id: 'ocucardio_multitask_resunet_v1',
+            dataset_id: 'drive',
+            architecture: 'multitask_resunet'
+          })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          const ev = data.evaluation;
+          const cm = ev.classification_metrics;
+          const sm = ev.segmentation_metrics;
+
+          document.getElementById('eval-acc').textContent = `${cm.accuracy}%`;
+          document.getElementById('eval-prec').textContent = `${cm.precision}%`;
+          document.getElementById('eval-rec').textContent = `${cm.recall}%`;
+          document.getElementById('eval-spec').textContent = `${cm.specificity}%`;
+          document.getElementById('eval-f1').textContent = `${cm.f1_score}%`;
+          document.getElementById('eval-auc').textContent = cm.roc_auc.toFixed(3);
+
+          document.getElementById('eval-dice').textContent = `${sm.dice_coefficient}%`;
+          document.getElementById('eval-iou').textContent = `${sm.iou_jaccard}%`;
+          document.getElementById('eval-pixel-acc').textContent = `${sm.pixel_accuracy}%`;
+          document.getElementById('eval-latency').textContent = `${ev.inference_time_ms} ms/image`;
+
+          // Confusion Matrix
+          const m = ev.confusion_matrix;
+          document.getElementById('matrix-tp').textContent = m.tp;
+          document.getElementById('matrix-fn').textContent = m.fn;
+          document.getElementById('matrix-fp').textContent = m.fp;
+          document.getElementById('matrix-tn').textContent = m.tn;
+          document.getElementById('eval-matrix-total').textContent = ev.test_sample_count;
+
+          // ROC Curve
+          renderRocCurve(ev.roc_curve);
+        } else {
+          alert('Evaluation failed: ' + data.error);
+        }
+      } catch (err) {
+        alert('Error communicating with evaluation pipeline.');
+      } finally {
+        btn.textContent = 'Run Test Evaluation';
+        btn.disabled = false;
+      }
+    }
+
+    function renderRocCurve(roc) {
+      if (!roc) return;
+      const svg = document.getElementById('svg-roc-curve');
+      const width = svg.clientWidth || 250;
+      const height = svg.clientHeight || 160;
+
+      let points = '';
+      roc.fpr.forEach((fpr, i) => {
+        const tpr = roc.tpr[i];
+        const x = fpr * (width - 30) + 15;
+        const y = height - 15 - tpr * (height - 30);
+        points += `${x},${y} `;
+      });
+
+      svg.innerHTML = `
+        <line x1="15" y1="${height-15}" x2="${width-15}" y2="15" stroke="#CBD5E1" stroke-dasharray="3" stroke-width="1.5" />
+        <polyline fill="none" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round" points="${points}" />
+      `;
+      document.getElementById('eval-roc-auc-text').textContent = roc.auc.toFixed(3);
+    }
+
+    // ================= MODEL MANAGEMENT =================
+    async function loadModelComparison() {
+      try {
+        const res = await fetch('/api/models/compare');
+        const data = await res.json();
+        const activeRes = await fetch('/api/models/active');
+        const activeData = await activeRes.json();
+        const active = activeData.active_model;
+
+        // Active Banner
+        if (active) {
+          document.getElementById('active-banner-title').textContent = active.name;
+          document.getElementById('active-banner-arch').textContent = active.architecture.toUpperCase();
+          document.getElementById('active-banner-desc').textContent = active.description;
+          document.getElementById('active-banner-acc').textContent = `${active.test_metrics.accuracy}%`;
+        }
+
+        // Comparison Table
+        const tbody = document.getElementById('model-comparison-tbody');
+        tbody.innerHTML = '';
+
+        data.comparison.forEach(m => {
+          const tr = document.createElement('tr');
+          tr.className = m.is_active ? 'bg-indigo-50/50 font-semibold' : 'hover:bg-slate-50 transition';
+
+          const bestBadge = m.is_best_performing ? '<span class="ml-1.5 px-1.5 py-0.5 rounded text-[9px] bg-emerald-100 text-emerald-800 font-bold">★ Best</span>' : '';
+          const activeStatus = m.is_active 
+            ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">Active</span>'
+            : `<button onclick="activateModel('${m.id}')" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white border border-slate-200 hover:bg-slate-100 text-slate-700">Set Active</button>`;
+
+          tr.innerHTML = `
+            <td class="py-2.5 px-3 text-slate-900 font-sans font-medium">${m.name} ${bestBadge}</td>
+            <td class="py-2.5 px-3 text-slate-600">${m.architecture}</td>
+            <td class="py-2.5 px-3 text-slate-600">${m.dataset_name}</td>
+            <td class="py-2.5 px-3 font-bold text-slate-900">${m.accuracy.toFixed(1)}%</td>
+            <td class="py-2.5 px-3 text-slate-700">${m.precision.toFixed(1)}%</td>
+            <td class="py-2.5 px-3 text-slate-700">${m.recall.toFixed(1)}%</td>
+            <td class="py-2.5 px-3 text-indigo-700 font-bold">${m.f1_score.toFixed(1)}%</td>
+            <td class="py-2.5 px-3 text-purple-700 font-bold">${m.roc_auc.toFixed(3)}</td>
+            <td class="py-2.5 px-3 text-emerald-700">${m.dice ? m.dice.toFixed(1) + '%' : '-'}</td>
+            <td class="py-2.5 px-3 text-slate-500">${m.inference_time_ms.toFixed(1)}ms</td>
+            <td class="py-2.5 px-3 text-right">${activeStatus}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Benchmark History
+        const histTbody = document.getElementById('benchmark-history-tbody');
+        histTbody.innerHTML = '';
+        data.benchmark_history.forEach(h => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50';
+          tr.innerHTML = `
+            <td class="py-2 px-3 text-slate-500">${h.experiment_id}</td>
+            <td class="py-2 px-3 text-slate-500 font-sans">${h.timestamp}</td>
+            <td class="py-2 px-3 font-bold text-slate-800 font-sans">${h.model_name}</td>
+            <td class="py-2 px-3 text-slate-600">${h.dataset}</td>
+            <td class="py-2 px-3 text-slate-600">${h.task}</td>
+            <td class="py-2 px-3 text-slate-700">${h.epochs}</td>
+            <td class="py-2 px-3 text-slate-700">${h.val_loss}</td>
+            <td class="py-2 px-3 font-bold text-indigo-700">${h.test_acc}</td>
+            <td class="py-2 px-3 text-slate-500">${h.inference_ms}</td>
+          `;
+          histTbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function activateModel(modelId) {
+      try {
+        const res = await fetch('/api/models/select', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model_id: modelId })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          loadModelComparison();
+        }
+      } catch (err) {
+        alert('Failed to switch active model.');
+      }
+    }
+
+    // Auto-load benchmark scan on page load
+    window.onload = function() {
+      loadQuickSample('data/real_fundus/images/007-1853-100.jpg');
+      loadDatasets();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+image_id,filename,mask_filename,patient_id,clinical_diagnosis,split,vessel_density_pct
+STARE_01,stare_01.jpg,stare_01_vessel.png,PT_STARE_01,Arteriolar Narrowing,train,8.9
+STARE_02,stare_02.jpg,stare_02_vessel.png,PT_STARE_01,Hemi-Central Vein Occlusion,train,9.8
+STARE_03,stare_03.jpg,stare_03_vessel.png,PT_STARE_02,Normal Fundus,train,10.7
+STARE_04,stare_04.jpg,stare_04_vessel.png,PT_STARE_02,Arteriolar Narrowing,train,11.6
+STARE_05,stare_05.jpg,stare_05_vessel.png,PT_STARE_03,Hemi-Central Vein Occlusion,train,8.9
+STARE_06,stare_06.jpg,stare_06_vessel.png,PT_STARE_03,Normal Fundus,train,9.8
+STARE_07,stare_07.jpg,stare_07_vessel.png,PT_STARE_04,Arteriolar Narrowing,train,10.7
+STARE_08,stare_08.jpg,stare_08_vessel.png,PT_STARE_04,Hemi-Central Vein Occlusion,train,11.6
+STARE_09,stare_09.jpg,stare_09_vessel.png,PT_STARE_05,Normal Fundus,train,8.9
+STARE_10,stare_10.jpg,stare_10_vessel.png,PT_STARE_05,Arteriolar Narrowing,train,9.8
+STARE_11,stare_11.jpg,stare_11_vessel.png,PT_STARE_06,Hemi-Central Vein Occlusion,train,10.7
+STARE_12,stare_12.jpg,stare_12_vessel.png,PT_STARE_06,Normal Fundus,train,11.6
+STARE_13,stare_13.jpg,stare_13_vessel.png,PT_STARE_07,Arteriolar Narrowing,train,8.9
+STARE_14,stare_14.jpg,stare_14_vessel.png,PT_STARE_07,Hemi-Central Vein Occlusion,val,9.8
+STARE_15,stare_15.jpg,stare_15_vessel.png,PT_STARE_08,Normal Fundus,val,10.7
+STARE_16,stare_16.jpg,stare_16_vessel.png,PT_STARE_08,Arteriolar Narrowing,val,11.6
+STARE_17,stare_17.jpg,stare_17_vessel.png,PT_STARE_09,Hemi-Central Vein Occlusion,test,8.9
+STARE_18,stare_18.jpg,stare_18_vessel.png,PT_STARE_09,Normal Fundus,test,9.8
+STARE_19,stare_19.jpg,stare_19_vessel.png,PT_STARE_10,Arteriolar Narrowing,test,10.7
+STARE_20,stare_20.jpg,stare_20_vessel.png,PT_STARE_10,Hemi-Central Vein Occlusion,test,11.6

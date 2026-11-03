@@ -1,0 +1,29 @@
+{
+  "id": "stare",
+  "name": "STARE (Structured Analysis of the Retina)",
+  "task_type": "vessel_segmentation",
+  "description": "Standard ophthalmology dataset containing fundus photos of healthy retinas and retinal vascular occlusions with dual-observer vessel annotations.",
+  "total_images": 20,
+  "labelled_images": 20,
+  "unlabelled_images": 0,
+  "dimensions": "512 x 512",
+  "formats": [
+    "JPEG",
+    "PNG"
+  ],
+  "classes": [
+    "Background",
+    "Vasculature",
+    "Arteriolar Occlusion"
+  ],
+  "label_distribution": {
+    "Normal Fundus": 7,
+    "Arteriolar Narrowing": 7,
+    "Hemi-Central Vein Occlusion": 6
+  },
+  "supports_cvd_prediction": false,
+  "patient_id_available": true,
+  "intended_task": "Vessel segmentation and arteriolar attenuation analysis",
+  "storage_path": "data/datasets/stare",
+  "status": "ready"
+}

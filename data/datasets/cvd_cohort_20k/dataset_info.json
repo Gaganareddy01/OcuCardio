@@ -1,0 +1,31 @@
+{
+  "id": "cvd_cohort_20k",
+  "name": "Clinical Retinal CVD Cohort (20,000 Patients)",
+  "task_type": "multitask_cvd_risk",
+  "description": "Large-scale 20,000 patient retinal fundus cohort with UK Biobank and Framingham risk calibration for 5-year ischemic stroke, CAD, and microvascular lesions.",
+  "total_images": 20000,
+  "labelled_images": 20000,
+  "unlabelled_images": 0,
+  "dimensions": "512 x 512",
+  "formats": [
+    "JPEG"
+  ],
+  "classes": [
+    "Low / Normative Risk",
+    "Moderate Vascular Risk",
+    "High Systemic Risk",
+    "Critical Vascular Hazard"
+  ],
+  "label_distribution": {
+    "Low / Normative Risk": 12000,
+    "Moderate Vascular Risk": 5000,
+    "High Systemic Risk": 2400,
+    "Critical Vascular Hazard": 600
+  },
+  "supports_cvd_prediction": true,
+  "patient_id_available": true,
+  "intended_task": "Multi-task retinal segmentation and systemic cardiovascular risk assessment",
+  "storage_path": "data/cohort_20000_images",
+  "manifest_path": "data/real_fundus/cohort_20k_manifest.json",
+  "status": "ready"
+}

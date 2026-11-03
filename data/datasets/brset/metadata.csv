@@ -1,0 +1,46 @@
+image_id,filename,patient_id,primary_finding,age,sex,systemic_hypertension,diabetes_mellitus,split
+BRSET_0001,brset_scan_0001.jpg,BR_PT_0001,Normal,50,Female,1,0,train
+BRSET_0002,brset_scan_0002.jpg,BR_PT_0002,Diabetic Retinopathy,51,Male,0,1,train
+BRSET_0003,brset_scan_0003.jpg,BR_PT_0003,Systemic Hypertension,52,Female,1,0,train
+BRSET_0004,brset_scan_0004.jpg,BR_PT_0004,Macular Edema,53,Male,1,1,train
+BRSET_0005,brset_scan_0005.jpg,BR_PT_0005,Papilledema,54,Female,0,0,train
+BRSET_0006,brset_scan_0006.jpg,BR_PT_0006,Normal,55,Male,0,0,train
+BRSET_0007,brset_scan_0007.jpg,BR_PT_0007,Diabetic Retinopathy,56,Female,1,1,train
+BRSET_0008,brset_scan_0008.jpg,BR_PT_0008,Systemic Hypertension,57,Male,1,0,train
+BRSET_0009,brset_scan_0009.jpg,BR_PT_0009,Macular Edema,58,Female,0,1,train
+BRSET_0010,brset_scan_0010.jpg,BR_PT_0010,Papilledema,59,Male,1,0,train
+BRSET_0011,brset_scan_0011.jpg,BR_PT_0011,Normal,60,Female,0,0,train
+BRSET_0012,brset_scan_0012.jpg,BR_PT_0012,Diabetic Retinopathy,61,Male,0,1,train
+BRSET_0013,brset_scan_0013.jpg,BR_PT_0013,Systemic Hypertension,62,Female,1,0,train
+BRSET_0014,brset_scan_0014.jpg,BR_PT_0014,Macular Edema,63,Male,0,1,train
+BRSET_0015,brset_scan_0015.jpg,BR_PT_0015,Papilledema,64,Female,0,0,train
+BRSET_0016,brset_scan_0016.jpg,BR_PT_0016,Normal,65,Male,1,0,train
+BRSET_0017,brset_scan_0017.jpg,BR_PT_0017,Diabetic Retinopathy,66,Female,0,1,train
+BRSET_0018,brset_scan_0018.jpg,BR_PT_0018,Systemic Hypertension,67,Male,1,0,train
+BRSET_0019,brset_scan_0019.jpg,BR_PT_0019,Macular Edema,68,Female,1,1,train
+BRSET_0020,brset_scan_0020.jpg,BR_PT_0020,Papilledema,69,Male,0,0,train
+BRSET_0021,brset_scan_0021.jpg,BR_PT_0021,Normal,70,Female,0,0,train
+BRSET_0022,brset_scan_0022.jpg,BR_PT_0022,Diabetic Retinopathy,71,Male,1,1,train
+BRSET_0023,brset_scan_0023.jpg,BR_PT_0023,Systemic Hypertension,72,Female,1,0,train
+BRSET_0024,brset_scan_0024.jpg,BR_PT_0024,Macular Edema,73,Male,0,1,train
+BRSET_0025,brset_scan_0025.jpg,BR_PT_0025,Papilledema,74,Female,1,0,train
+BRSET_0026,brset_scan_0026.jpg,BR_PT_0026,Normal,75,Male,0,0,train
+BRSET_0027,brset_scan_0027.jpg,BR_PT_0027,Diabetic Retinopathy,76,Female,0,1,train
+BRSET_0028,brset_scan_0028.jpg,BR_PT_0028,Systemic Hypertension,77,Male,1,0,train
+BRSET_0029,brset_scan_0029.jpg,BR_PT_0029,Macular Edema,78,Female,0,1,val
+BRSET_0030,brset_scan_0030.jpg,BR_PT_0030,Papilledema,79,Male,0,0,val
+BRSET_0031,brset_scan_0031.jpg,BR_PT_0031,Normal,50,Female,1,0,val
+BRSET_0032,brset_scan_0032.jpg,BR_PT_0032,Diabetic Retinopathy,51,Male,0,1,val
+BRSET_0033,brset_scan_0033.jpg,BR_PT_0033,Systemic Hypertension,52,Female,1,0,val
+BRSET_0034,brset_scan_0034.jpg,BR_PT_0034,Macular Edema,53,Male,1,1,val
+BRSET_0035,brset_scan_0035.jpg,BR_PT_0035,Papilledema,54,Female,0,0,val
+BRSET_0036,brset_scan_0036.jpg,BR_PT_0036,Normal,55,Male,0,0,val
+BRSET_0037,brset_scan_0037.jpg,BR_PT_0037,Diabetic Retinopathy,56,Female,1,1,test
+BRSET_0038,brset_scan_0038.jpg,BR_PT_0038,Systemic Hypertension,57,Male,1,0,test
+BRSET_0039,brset_scan_0039.jpg,BR_PT_0039,Macular Edema,58,Female,0,1,test
+BRSET_0040,brset_scan_0040.jpg,BR_PT_0040,Papilledema,59,Male,1,0,test
+BRSET_0041,brset_scan_0041.jpg,BR_PT_0041,Normal,60,Female,0,0,test
+BRSET_0042,brset_scan_0042.jpg,BR_PT_0042,Diabetic Retinopathy,61,Male,0,1,test
+BRSET_0043,brset_scan_0043.jpg,BR_PT_0043,Systemic Hypertension,62,Female,1,0,test
+BRSET_0044,brset_scan_0044.jpg,BR_PT_0044,Macular Edema,63,Male,0,1,test
+BRSET_0045,brset_scan_0045.jpg,BR_PT_0045,Papilledema,64,Female,0,0,test

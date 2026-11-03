@@ -1,0 +1,403 @@
+[
+  {
+    "base_name": "007-1789-100",
+    "image_path": "data/real_fundus\\images\\007-1789-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-1789-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 79
+  },
+  {
+    "base_name": "007-1853-100",
+    "image_path": "data/real_fundus\\images\\007-1853-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-1853-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 109,
+    "he_pixels": 90
+  },
+  {
+    "base_name": "007-2403-100",
+    "image_path": "data/real_fundus\\images\\007-2403-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2403-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 71
+  },
+  {
+    "base_name": "007-2404-100",
+    "image_path": "data/real_fundus\\images\\007-2404-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2404-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 7,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2407-100",
+    "image_path": "data/real_fundus\\images\\007-2407-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2407-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 7,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2408-100",
+    "image_path": "data/real_fundus\\images\\007-2408-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2408-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 8,
+    "he_pixels": 26
+  },
+  {
+    "base_name": "007-2415-100",
+    "image_path": "data/real_fundus\\images\\007-2415-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2415-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 56,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2428-100",
+    "image_path": "data/real_fundus\\images\\007-2428-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2428-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 2,
+    "he_pixels": 47
+  },
+  {
+    "base_name": "007-2449-100",
+    "image_path": "data/real_fundus\\images\\007-2449-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2449-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 33,
+    "he_pixels": 35
+  },
+  {
+    "base_name": "007-2450-100",
+    "image_path": "data/real_fundus\\images\\007-2450-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2450-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 73
+  },
+  {
+    "base_name": "007-2452-100",
+    "image_path": "data/real_fundus\\images\\007-2452-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2452-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 53,
+    "he_pixels": 23
+  },
+  {
+    "base_name": "007-2453-100",
+    "image_path": "data/real_fundus\\images\\007-2453-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2453-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 52,
+    "he_pixels": 74
+  },
+  {
+    "base_name": "007-2454-100",
+    "image_path": "data/real_fundus\\images\\007-2454-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2454-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 75,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2457-100",
+    "image_path": "data/real_fundus\\images\\007-2457-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2457-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 4,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2460-100",
+    "image_path": "data/real_fundus\\images\\007-2460-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2460-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 6,
+    "he_pixels": 31
+  },
+  {
+    "base_name": "007-2466-100",
+    "image_path": "data/real_fundus\\images\\007-2466-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2466-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 15,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2467-100",
+    "image_path": "data/real_fundus\\images\\007-2467-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2467-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 10,
+    "he_pixels": 258
+  },
+  {
+    "base_name": "007-2468-100",
+    "image_path": "data/real_fundus\\images\\007-2468-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2468-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 2,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2469-100",
+    "image_path": "data/real_fundus\\images\\007-2469-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2469-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 15,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2470-100",
+    "image_path": "data/real_fundus\\images\\007-2470-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2470-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 16,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2471-100",
+    "image_path": "data/real_fundus\\images\\007-2471-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2471-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 51,
+    "he_pixels": 254
+  },
+  {
+    "base_name": "007-2477-100",
+    "image_path": "data/real_fundus\\images\\007-2477-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2477-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 91,
+    "he_pixels": 53
+  },
+  {
+    "base_name": "007-2479-100",
+    "image_path": "data/real_fundus\\images\\007-2479-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2479-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 10,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2481-100",
+    "image_path": "data/real_fundus\\images\\007-2481-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2481-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 20,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2486-100",
+    "image_path": "data/real_fundus\\images\\007-2486-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2486-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 23,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2492-100",
+    "image_path": "data/real_fundus\\images\\007-2492-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2492-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 9,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2503-100",
+    "image_path": "data/real_fundus\\images\\007-2503-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2503-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 27,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2505-100",
+    "image_path": "data/real_fundus\\images\\007-2505-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2505-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 19,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2525-100",
+    "image_path": "data/real_fundus\\images\\007-2525-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2525-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 18,
+    "he_pixels": 45
+  },
+  {
+    "base_name": "007-2567-100",
+    "image_path": "data/real_fundus\\images\\007-2567-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2567-100_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 33,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2808-100",
+    "image_path": "data/real_fundus\\images\\007-2808-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2808-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 3,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-2809-100",
+    "image_path": "data/real_fundus\\images\\007-2809-100.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-2809-100_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 6,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-3454-200",
+    "image_path": "data/real_fundus\\images\\007-3454-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3454-200_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 23,
+    "he_pixels": 1304
+  },
+  {
+    "base_name": "007-3489-200",
+    "image_path": "data/real_fundus\\images\\007-3489-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3489-200_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 28,
+    "he_pixels": 26740
+  },
+  {
+    "base_name": "007-3494-200",
+    "image_path": "data/real_fundus\\images\\007-3494-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3494-200_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 1033
+  },
+  {
+    "base_name": "007-3509-200",
+    "image_path": "data/real_fundus\\images\\007-3509-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3509-200_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 1274
+  },
+  {
+    "base_name": "007-3528-200",
+    "image_path": "data/real_fundus\\images\\007-3528-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3528-200_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 3738
+  },
+  {
+    "base_name": "007-3539-200",
+    "image_path": "data/real_fundus\\images\\007-3539-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3539-200_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 443
+  },
+  {
+    "base_name": "007-3552-200",
+    "image_path": "data/real_fundus\\images\\007-3552-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3552-200_mask.npy",
+    "risk_label": 0.0,
+    "ma_pixels": 2,
+    "he_pixels": 0
+  },
+  {
+    "base_name": "007-3567-200",
+    "image_path": "data/real_fundus\\images\\007-3567-200.jpg",
+    "mask_path": "data/real_fundus\\masks\\007-3567-200_mask.npy",
+    "risk_label": 1.0,
+    "ma_pixels": 0,
+    "he_pixels": 4328
+  },
+  {
+    "base_name": "patient_crao_01",
+    "image_path": "data/real_fundus\\images\\patient_crao_01.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_01_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO)",
+    "ma_pixels": 613,
+    "he_pixels": 27008
+  },
+  {
+    "base_name": "patient_crao_aug_01",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_01.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_01_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 557,
+    "he_pixels": 24581
+  },
+  {
+    "base_name": "patient_crao_aug_02",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_02.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_02_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 606,
+    "he_pixels": 26710
+  },
+  {
+    "base_name": "patient_crao_aug_03",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_03.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_03_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 592,
+    "he_pixels": 26125
+  },
+  {
+    "base_name": "patient_crao_aug_04",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_04.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_04_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 556,
+    "he_pixels": 24530
+  },
+  {
+    "base_name": "patient_crao_aug_05",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_05.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_05_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 572,
+    "he_pixels": 25209
+  },
+  {
+    "base_name": "patient_crao_aug_06",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_06.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_06_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 673,
+    "he_pixels": 29695
+  },
+  {
+    "base_name": "patient_crao_aug_07",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_07.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_07_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 647,
+    "he_pixels": 28519
+  },
+  {
+    "base_name": "patient_crao_aug_08",
+    "image_path": "data/real_fundus\\images\\patient_crao_aug_08.jpg",
+    "mask_path": "data/real_fundus\\masks\\patient_crao_aug_08_mask.npy",
+    "risk_label": 1.0,
+    "diagnosis": "Central Retinal Artery Occlusion (CRAO) Variant",
+    "ma_pixels": 633,
+    "he_pixels": 27919
+  }
+]

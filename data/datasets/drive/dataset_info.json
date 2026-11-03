@@ -1,0 +1,27 @@
+{
+  "id": "drive",
+  "name": "DRIVE (Digital Retinal Images for Vessel Extraction)",
+  "task_type": "vessel_segmentation",
+  "description": "Benchmark retinal dataset for segmentation of retinal blood vessels and arteriolar vascular architecture. Includes manual expert ground-truth annotations.",
+  "total_images": 20,
+  "labelled_images": 20,
+  "unlabelled_images": 0,
+  "dimensions": "512 x 512",
+  "formats": [
+    "JPEG",
+    "PNG"
+  ],
+  "classes": [
+    "Background",
+    "Retinal Vasculature"
+  ],
+  "label_distribution": {
+    "Background": 90.4,
+    "Retinal Vasculature": 9.6
+  },
+  "supports_cvd_prediction": false,
+  "patient_id_available": true,
+  "intended_task": "Retinal vessel tree extraction & caliber quantification",
+  "storage_path": "data/datasets/drive",
+  "status": "ready"
+}

@@ -1,0 +1,38 @@
+{
+  "id": "odir_5k",
+  "name": "ODIR-5K (Ocular Disease Intelligent Recognition)",
+  "task_type": "disease_classification",
+  "description": "Structured multi-label ocular disease dataset with 8 diagnostic categories including systemic Hypertension (H) and Diabetic Retinopathy.",
+  "total_images": 48,
+  "labelled_images": 48,
+  "unlabelled_images": 0,
+  "dimensions": "512 x 512",
+  "formats": [
+    "JPEG"
+  ],
+  "classes": [
+    "Normal (N)",
+    "Diabetes (D)",
+    "Glaucoma (G)",
+    "Cataract (C)",
+    "AMD (A)",
+    "Hypertension (H)",
+    "Myopia (M)",
+    "Other (O)"
+  ],
+  "label_distribution": {
+    "Normal (N)": 6,
+    "Diabetes (D)": 6,
+    "Glaucoma (G)": 6,
+    "Cataract (C)": 6,
+    "AMD (A)": 6,
+    "Hypertension (H)": 6,
+    "Myopia (M)": 6,
+    "Other (O)": 6
+  },
+  "supports_cvd_prediction": true,
+  "patient_id_available": true,
+  "intended_task": "Multi-category ocular diagnosis & hypertensive retinopathy screening",
+  "storage_path": "data/datasets/odir_5k",
+  "status": "ready"
+}

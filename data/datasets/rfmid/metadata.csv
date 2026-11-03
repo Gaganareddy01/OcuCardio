@@ -1,0 +1,41 @@
+image_id,filename,disease_class,binary_disease,split,quality
+RFMiD_001,RFMiD_scan_001.jpg,Normal,0,train,Gradable
+RFMiD_002,RFMiD_scan_002.jpg,Diabetic Retinopathy,1,train,Gradable
+RFMiD_003,RFMiD_scan_003.jpg,Age-Related Macular Degeneration,1,train,Gradable
+RFMiD_004,RFMiD_scan_004.jpg,Media Haze,1,train,Gradable
+RFMiD_005,RFMiD_scan_005.jpg,Branch Retinal Vein Occlusion,1,train,Gradable
+RFMiD_006,RFMiD_scan_006.jpg,Myopia,1,train,Gradable
+RFMiD_007,RFMiD_scan_007.jpg,Normal,0,train,Gradable
+RFMiD_008,RFMiD_scan_008.jpg,Diabetic Retinopathy,1,train,Gradable
+RFMiD_009,RFMiD_scan_009.jpg,Age-Related Macular Degeneration,1,train,Gradable
+RFMiD_010,RFMiD_scan_010.jpg,Media Haze,1,train,Gradable
+RFMiD_011,RFMiD_scan_011.jpg,Branch Retinal Vein Occlusion,1,train,Gradable
+RFMiD_012,RFMiD_scan_012.jpg,Myopia,1,train,Gradable
+RFMiD_013,RFMiD_scan_013.jpg,Normal,0,train,Gradable
+RFMiD_014,RFMiD_scan_014.jpg,Diabetic Retinopathy,1,train,Gradable
+RFMiD_015,RFMiD_scan_015.jpg,Age-Related Macular Degeneration,1,train,Gradable
+RFMiD_016,RFMiD_scan_016.jpg,Media Haze,1,train,Gradable
+RFMiD_017,RFMiD_scan_017.jpg,Branch Retinal Vein Occlusion,1,train,Gradable
+RFMiD_018,RFMiD_scan_018.jpg,Myopia,1,train,Gradable
+RFMiD_019,RFMiD_scan_019.jpg,Normal,0,train,Gradable
+RFMiD_020,RFMiD_scan_020.jpg,Diabetic Retinopathy,1,train,Gradable
+RFMiD_021,RFMiD_scan_021.jpg,Age-Related Macular Degeneration,1,train,Gradable
+RFMiD_022,RFMiD_scan_022.jpg,Media Haze,1,train,Gradable
+RFMiD_023,RFMiD_scan_023.jpg,Branch Retinal Vein Occlusion,1,train,Gradable
+RFMiD_024,RFMiD_scan_024.jpg,Myopia,1,train,Gradable
+RFMiD_025,RFMiD_scan_025.jpg,Normal,0,train,Gradable
+RFMiD_026,RFMiD_scan_026.jpg,Diabetic Retinopathy,1,train,Gradable
+RFMiD_027,RFMiD_scan_027.jpg,Age-Related Macular Degeneration,1,val,Gradable
+RFMiD_028,RFMiD_scan_028.jpg,Media Haze,1,val,Gradable
+RFMiD_029,RFMiD_scan_029.jpg,Branch Retinal Vein Occlusion,1,val,Gradable
+RFMiD_030,RFMiD_scan_030.jpg,Myopia,1,val,Gradable
+RFMiD_031,RFMiD_scan_031.jpg,Normal,0,val,Gradable
+RFMiD_032,RFMiD_scan_032.jpg,Diabetic Retinopathy,1,val,Gradable
+RFMiD_033,RFMiD_scan_033.jpg,Age-Related Macular Degeneration,1,test,Gradable
+RFMiD_034,RFMiD_scan_034.jpg,Media Haze,1,test,Gradable
+RFMiD_035,RFMiD_scan_035.jpg,Branch Retinal Vein Occlusion,1,test,Gradable
+RFMiD_036,RFMiD_scan_036.jpg,Myopia,1,test,Gradable
+RFMiD_037,RFMiD_scan_037.jpg,Normal,0,test,Gradable
+RFMiD_038,RFMiD_scan_038.jpg,Diabetic Retinopathy,1,test,Gradable
+RFMiD_039,RFMiD_scan_039.jpg,Age-Related Macular Degeneration,1,test,Gradable
+RFMiD_040,RFMiD_scan_040.jpg,Media Haze,1,test,Gradable
