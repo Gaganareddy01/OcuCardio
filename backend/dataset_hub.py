@@ -97,7 +97,7 @@ class DatasetHub:
         sample_rows = []
         if os.path.exists(csv_path):
             try:
-                with open(csv_path, "r", encoding="utf-8") as f:
+                with open(csv_path, "r", encoding="utf-8-sig") as f:
                     reader = csv.DictReader(f)
                     for r in reader:
                         sample_rows.append(r)
@@ -160,12 +160,16 @@ class DatasetHub:
         csv_map = {}
         if os.path.exists(csv_path):
             try:
-                with open(csv_path, "r", encoding="utf-8") as f:
+                with open(csv_path, "r", encoding="utf-8-sig") as f:
                     reader = csv.DictReader(f)
                     for r in reader:
-                        fname = r.get("filename")
+                        fname = r.get("filename") or r.get("file") or r.get("image") or r.get("image_name")
+                        img_id = str(r.get("ID") or r.get("id") or r.get("image_id") or "").strip()
                         if fname:
                             csv_map[fname] = r
+                            csv_map[os.path.splitext(fname)[0]] = r
+                        if img_id:
+                            csv_map[img_id] = r
             except Exception:
                 pass
 
@@ -173,9 +177,17 @@ class DatasetHub:
         
         filtered = []
         for f in all_files:
-            meta = csv_map.get(f, {})
-            label = meta.get("disease_class") or meta.get("diagnosis") or meta.get("primary_finding") or meta.get("task") or "Labelled"
-            pid = meta.get("patient_id", "")
+            stem = os.path.splitext(f)[0]
+            meta = csv_map.get(f) or csv_map.get(stem, {})
+            label = meta.get("disease_class") or meta.get("diagnosis") or meta.get("primary_finding") or meta.get("task")
+            if not label and "Disease_Risk" in meta:
+                label = "Disease Risk: Positive" if str(meta["Disease_Risk"]).strip() == "1" else "Normal / Normative"
+            if not label and "binary_disease" in meta:
+                label = "Abnormal" if str(meta["binary_disease"]).strip() == "1" else "Normal"
+            if not label:
+                label = meta.get("label", "Labelled")
+
+            pid = meta.get("patient_id") or meta.get("ID") or stem
             
             if search:
                 q = search.lower()
@@ -255,11 +267,15 @@ class DatasetHub:
         label_dist = {"Unclassified": len(extracted_images)}
         if csv_file_path and os.path.exists(csv_file_path):
             try:
-                with open(csv_file_path, "r", encoding="utf-8") as f:
+                with open(csv_file_path, "r", encoding="utf-8-sig") as f:
                     reader = csv.DictReader(f)
                     labels = []
                     for r in reader:
-                        lbl = r.get("label") or r.get("diagnosis") or r.get("class") or "Sample"
+                        lbl = r.get("label") or r.get("diagnosis") or r.get("class") or r.get("primary_finding")
+                        if not lbl and "Disease_Risk" in r:
+                            lbl = "Disease Risk: Positive" if str(r["Disease_Risk"]).strip() == "1" else "Normal / Normative"
+                        if not lbl:
+                            lbl = "Clinical Record"
                         labels.append(lbl)
                     if labels:
                         from collections import Counter
@@ -381,7 +397,7 @@ class DatasetHub:
         csv_path = os.path.join(folder, "metadata.csv")
         csv_count = 0
         if os.path.exists(csv_path):
-            with open(csv_path, "r", encoding="utf-8") as f:
+            with open(csv_path, "r", encoding="utf-8-sig") as f:
                 csv_count = max(0, len(f.readlines()) - 1)
 
         return {

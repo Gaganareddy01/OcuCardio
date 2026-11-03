@@ -142,20 +142,24 @@ class RetinalDatasetPyTorch(Dataset):
 
         # Segmentation mask handling
         mask_tensor = torch.zeros((1, self.image_size[1], self.image_size[0]), dtype=torch.float32)
-        if "segmentation" in self.task_type or item.get("mask_filename"):
-            mask_fname = item.get("mask_filename")
-            if mask_fname:
-                mask_path = os.path.join(self.base_dir, "masks", mask_fname)
-                if os.path.exists(mask_path):
-                    try:
-                        mask_img = Image.open(mask_path).convert("L")
-                        mask_img = mask_img.resize(self.image_size, Image.NEAREST)
-                        if self.augmenter and self.is_training:
-                            img, mask_img = self.augmenter(img, mask_img)
-                        mask_arr = np.array(mask_img, dtype=np.float32) / 255.0
-                        mask_tensor = torch.from_numpy(mask_arr).unsqueeze(0)
-                    except Exception:
-                        pass
+        mask_fname = item.get("mask_filename")
+        if not mask_fname and isinstance(item.get("details"), dict):
+            mask_fname = item["details"].get("mask_filename")
+        if not mask_fname and item.get("mask_relative_path"):
+            mask_fname = os.path.basename(item["mask_relative_path"])
+
+        if mask_fname:
+            mask_path = os.path.join(self.base_dir, "masks", mask_fname)
+            if os.path.exists(mask_path):
+                try:
+                    mask_img = Image.open(mask_path).convert("L")
+                    mask_img = mask_img.resize(self.image_size, Image.NEAREST)
+                    if self.augmenter and self.is_training:
+                        img, mask_img = self.augmenter(img, mask_img)
+                    mask_arr = np.array(mask_img, dtype=np.float32) / 255.0
+                    mask_tensor = torch.from_numpy(mask_arr).unsqueeze(0)
+                except Exception:
+                    pass
         elif self.augmenter and self.is_training:
             img = self.augmenter(img)
 
@@ -169,20 +173,42 @@ class RetinalDatasetPyTorch(Dataset):
 
         # Classification label handling
         label = 0.0
-        if "binary_disease" in item:
-            label = float(item["binary_disease"])
-        elif "has_hypertension" in item:
-            label = float(item["has_hypertension"])
-        elif "systemic_hypertension" in item:
-            label = float(item["systemic_hypertension"])
-        elif "cvd_risk_score" in item:
-            label = 1.0 if float(item["cvd_risk_score"]) >= 50.0 else 0.0
-        elif "risk_label" in item:
-            label = float(item["risk_label"])
+        details = item.get("details", {}) if isinstance(item.get("details"), dict) else {}
+        
+        def _lookup(k):
+            val = item.get(k)
+            if val is not None and str(val).strip() != "":
+                return val
+            val = details.get(k)
+            if val is not None and str(val).strip() != "":
+                return val
+            return None
+
+        raw_label = None
+        for key in ["Disease_Risk", "disease_risk", "binary_disease", "has_hypertension",
+                    "systemic_hypertension", "diabetes_mellitus", "cvd_risk_score", "risk_label", "label"]:
+            candidate = _lookup(key)
+            if candidate is not None:
+                raw_label = candidate
+                break
+
+        if raw_label is not None:
+            try:
+                num = float(raw_label)
+                if num > 1.0:
+                    label = 1.0 if num >= 50.0 else 0.0
+                else:
+                    label = 1.0 if num >= 0.5 else 0.0
+            except (ValueError, TypeError):
+                s = str(raw_label).strip().lower()
+                if s in ["normal", "0", "false", "negative", "healthy", "no"]:
+                    label = 0.0
+                else:
+                    label = 1.0
 
         return {
             "image": img_tensor,
             "mask": mask_tensor,
             "label": torch.tensor(label, dtype=torch.float32),
-            "meta": item
+            "filename": str(fname or "")
         }

@@ -61,6 +61,7 @@ data/dataset_catalog.json
 data/dataset_catalog.json.tmp
 data/uploaded_datasets/*
 !data/uploaded_datasets/.gitkeep
+data/datasets/test_set/
 
 # Operating System Files
 .DS_Store
